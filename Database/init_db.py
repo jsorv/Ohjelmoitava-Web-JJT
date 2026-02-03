@@ -5,9 +5,10 @@ def init_db(db_path='database.db'):
 
     conn = sqlite3.connect(db_path)
     cur = conn.cursor()
+    conn.execute("PRAGMA foreign_keys = ON;")
 
     #locations table
-    cur.execute(""""
+    cur.execute("""
         CREATE TABLE IF NOT EXISTS locations (
             location_id INTEGER PRIMARY KEY,
             county TEXT NOT NULL,
