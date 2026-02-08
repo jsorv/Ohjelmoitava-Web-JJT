@@ -1,9 +1,24 @@
-TODO:
+# Project Database
 
-- All dependencies (external libraries) and how to install them
+**Dependencies**
+- Flask>=2.2
+- Flask-SQLAlchemy>=3.0
+- SQLAlchemy>=1.4
 
-- Define database (MySQL, SQLite, MariaDB, MongoDB...) and version utilized
+**Notes**
+- This project uses SQLite via the built-in Python `sqlite3` module.
 
-- Instructions how to setup the database framework and external libraries you might have used, or a link where it is clearly explained.
+**Quick setup (recommended from project root)**
+1. Create a virtual environment and activate it:
 
-- Instructions on how to setup and populate the database.
+2. Install dependencies:
+
+```
+pip install -r Database/requirements.txt
+```
+
+3. Initialize the database (creates tables if they don't exist):
+
+```
+python Database\init_db.py
+```
