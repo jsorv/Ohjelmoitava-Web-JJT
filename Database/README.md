@@ -22,3 +22,8 @@ pip install -r Database/requirements.txt
 ```
 python Database\init_db.py
 ```
+4. Populate the databse (Adds some basic examples):
+
+```
+python Database\populate_db.py
+```
