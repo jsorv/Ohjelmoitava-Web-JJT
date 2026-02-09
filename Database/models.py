@@ -8,6 +8,7 @@ db = SQLAlchemy(app)
 
 class Location(db.Model):
     __tablename__ = "locations"
+    __table_args__ = (db.UniqueConstraint("country", "city", name="uq_country_city"),)
 
     location_id = db.Column(db.Integer, primary_key=True)
     country = db.Column(db.String(64), nullable=False)
@@ -20,6 +21,9 @@ class Location(db.Model):
         back_populates="location",
         cascade="all, delete-orphan"
     )
+
+    def __repr__(self):
+        return f"<Location {self.city}, {self.country}>"
 
 class WeatherReport(db.Model):
     __tablename__ = "weather_reports"
@@ -44,3 +48,5 @@ class WeatherReport(db.Model):
         back_populates="weather_reports"
     )
 
+    def __repr__(self):
+        return f"<WeatherReport {self.entry_type} for {self.location.id} at {self.report_time}>"
