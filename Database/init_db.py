@@ -11,16 +11,21 @@ def init_db(db_path='database.db'):
     cur.execute("""
         CREATE TABLE IF NOT EXISTS locations (
             location_id INTEGER PRIMARY KEY,
-            county TEXT NOT NULL,
+            country TEXT NOT NULL,
             city TEXT NOT NULL,
-        ;
+            latitude REAL NOT NULL,
+            longitude REAL NOT NULL
+        );
         """)
     
     #weather_data report
     cur.execute("""
-        CREATE TABLE IF NOT EXISTS weather_report (
+        CREATE TABLE IF NOT EXISTS weather_reports (
             report_id INTEGER PRIMARY KEY CHECK(report_id > 0),
             location_id INTEGER NOT NULL,
+            entry_type TEXT NOT NULL CHECK(entry_type IN ('report','forecast')),
+            report_time TEXT NOT NULL,
+            forecast_time TEXT,
             temperature REAL,
             humidity INTEGER CHECK(humidity BETWEEN 0 AND 100),
             wind_speed REAL CHECK(wind_speed >= 0),
@@ -35,3 +40,6 @@ def init_db(db_path='database.db'):
     
     conn.commit()
     conn.close()
+
+    if __name__ == "__main__":
+        init_db()
