@@ -25,7 +25,7 @@ class WeatherReport(db.Model):
     __tablename__ = "weather_reports"
 
     report_id = db.Column(db.Integer, primary_key=True)
-    location_id = db.Column(db.Integer, db.ForeignKey("location.location_id"), nullable=False)
+    location_id = db.Column(db.Integer, db.ForeignKey("locations.location_id"), nullable=False)
 
     entry_type = db.Column(db.Enum("report", "forecast", name="entry_type_enum"),nullable=False) # "report" or "forecast"
 
