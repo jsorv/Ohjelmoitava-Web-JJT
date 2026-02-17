@@ -17,12 +17,17 @@ Note that our API is a data storage.
 
 
 ## Meeting 2.
-* **DATE:**
-* **PARTICIPANTS:**
-* **TEACHER:**
+* **DATE:17.02.2026**
+* **PARTICIPANTS:Jaakko Hietikko Teemu Kulojärvi Jenna Sorvoja**
+* **TEACHER:Mika Oja**
 
 ### Action points
-*List here the actions points discussed with assistants*
+
+- Project layout rework. Jokasella projectilla oma root. 
+
+- requirements.txt --> pyproject.toml
+
+- Black käyttöön (Formataa koodin)
 
 ### Notes
 *Add here notes that you consider important. This is not mandatory*
