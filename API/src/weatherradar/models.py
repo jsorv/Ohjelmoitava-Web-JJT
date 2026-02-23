@@ -1,8 +1,10 @@
+import os
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 
 app = Flask("WeatherApp")
-app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///weather.db"
+base_dir = os.path.dirname(os.path.abspath(__file__))
+app.config["SQLALCHEMY_DATABASE_URI"] = f"sqlite:///{os.path.join(base_dir, 'weather.db')}"
 app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 db = SQLAlchemy(app)
 
