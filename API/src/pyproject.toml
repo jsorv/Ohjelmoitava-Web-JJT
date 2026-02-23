@@ -1,0 +1,21 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "weatherradar"
+version = "0.1.0"
+description = "Weather radar models and utilities for the Ohjelmoitava API"
+readme = "README.md"
+requires-python = ">=3.8"
+license = { text = "MIT" }
+authors = [ { name = "Ohjelmoitava Web JJT" } ]
+
+dependencies = [
+	"Flask>=2.0",
+	"Flask-SQLAlchemy>=3.0"
+]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
