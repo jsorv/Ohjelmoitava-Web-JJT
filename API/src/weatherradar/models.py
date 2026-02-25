@@ -1,12 +1,4 @@
-import os
-from flask import Flask
-from flask_sqlalchemy import SQLAlchemy
-
-app = Flask("WeatherApp")
-base_dir = os.path.dirname(os.path.abspath(__file__))
-app.config["SQLALCHEMY_DATABASE_URI"] = f"sqlite:///{os.path.join(base_dir, 'weather.db')}"
-app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
-db = SQLAlchemy(app)
+from . import db
 
 class Location(db.Model):
     __tablename__ = "locations"
@@ -26,6 +18,20 @@ class Location(db.Model):
 
     def __repr__(self):
         return f"<Location {self.city}, {self.country}>"
+    
+    #todo
+    def serialize(self):
+        pass
+
+    #todo
+    def deserialize(self):
+        pass
+    
+    #todo
+    @staticmethod
+    def json_schema():
+        pass
+
 
 class WeatherReport(db.Model):
     __tablename__ = "weather_reports"
@@ -52,3 +58,16 @@ class WeatherReport(db.Model):
 
     def __repr__(self):
         return f"<WeatherReport {self.entry_type} for {self.location.id} at {self.report_time}>"
+    
+    #todo
+    def serialize(self):
+        pass
+
+    #todo
+    def deserialize(self):
+        pass
+    
+    #todo
+    @staticmethod
+    def json_schema():
+        pass
