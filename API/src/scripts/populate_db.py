@@ -2,7 +2,9 @@ from datetime import datetime, timedelta
 from src.weatherradar.models import db, app, Location, WeatherReport
 
 
-def create_location(country: str, city: str, latitude: float, longitude: float) -> Location:
+def create_location(
+    country: str, city: str, latitude: float, longitude: float
+) -> Location:
     loc = Location.query.filter_by(country=country, city=city).first()
     if loc:
         return loc
@@ -12,9 +14,18 @@ def create_location(country: str, city: str, latitude: float, longitude: float) 
     return loc
 
 
-def add_weather_report(location: Location, entry_type: str, report_time: datetime,
-                                  forecast_time: datetime | None, temperature: float, humidity: int,
-                                  wind_speed: float, cloud_cover: int, rain: bool, fog: bool) -> WeatherReport:
+def add_weather_report(
+    location: Location,
+    entry_type: str,
+    report_time: datetime,
+    forecast_time: datetime | None,
+    temperature: float,
+    humidity: int,
+    wind_speed: float,
+    cloud_cover: int,
+    rain: bool,
+    fog: bool,
+) -> WeatherReport:
 
     report = WeatherReport(
         location_id=location.location_id,
@@ -44,20 +55,49 @@ if __name__ == "__main__":
         add_weather_report(
             helsinki, "report", now, None, 5.2, 75, 3.5, 40, False, False
         )
+        add_weather_report(tampere, "report", now, None, 3.1, 85, 2.2, 60, False, True)
+        add_weather_report(oulu, "report", now, None, -2.5, 90, 1.0, 80, True, True)
         add_weather_report(
-            tampere, "report", now, None, 3.1, 85, 2.2, 60, False, True
+            helsinki,
+            "forecast",
+            now,
+            now + timedelta(hours=6),
+            4.0,
+            80,
+            4.0,
+            50,
+            True,
+            False,
         )
         add_weather_report(
-            oulu, "report", now, None, -2.5, 90, 1.0, 80, True, True
+            tampere,
+            "forecast",
+            now,
+            now + timedelta(hours=6),
+            2.0,
+            90,
+            3.0,
+            70,
+            False,
+            False,
         )
         add_weather_report(
-            helsinki, "forecast", now, now + timedelta(hours=6), 4.0, 80, 4.0, 50, True, False
-        )
-        add_weather_report(
-            tampere, "forecast", now, now + timedelta(hours=6), 2.0, 90, 3.0, 70, False, False
-        )
-        add_weather_report(
-            oulu, "forecast", now, now + timedelta(hours=6), -3.5, 95, 2.5, 90, True, True
+            oulu,
+            "forecast",
+            now,
+            now + timedelta(hours=6),
+            -3.5,
+            95,
+            2.5,
+            90,
+            True,
+            True,
         )
 
-        print("Populate complete:", Location.query.count(), "locations;", WeatherReport.query.count(), "reports")
+        print(
+            "Populate complete:",
+            Location.query.count(),
+            "locations;",
+            WeatherReport.query.count(),
+            "reports",
+        )

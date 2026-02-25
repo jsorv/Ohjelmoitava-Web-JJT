@@ -1,5 +1,6 @@
 from . import db
 
+
 class Location(db.Model):
     __tablename__ = "locations"
     __table_args__ = (db.UniqueConstraint("country", "city", name="uq_country_city"),)
@@ -11,23 +12,21 @@ class Location(db.Model):
     longitude = db.Column(db.Float, nullable=False)
 
     weather_reports = db.relationship(
-        "WeatherReport",
-        back_populates="location",
-        cascade="all, delete-orphan"
+        "WeatherReport", back_populates="location", cascade="all, delete-orphan"
     )
 
     def __repr__(self):
         return f"<Location {self.city}, {self.country}>"
-    
-    #todo
+
+    # todo
     def serialize(self):
         pass
 
-    #todo
+    # todo
     def deserialize(self):
         pass
-    
-    #todo
+
+    # todo
     @staticmethod
     def json_schema():
         pass
@@ -37,37 +36,107 @@ class WeatherReport(db.Model):
     __tablename__ = "weather_reports"
 
     report_id = db.Column(db.Integer, primary_key=True)
-    location_id = db.Column(db.Integer, db.ForeignKey("locations.location_id"), nullable=False)
+    location_id = db.Column(
+        db.Integer, db.ForeignKey("locations.location_id"), nullable=False
+    )
 
-    entry_type = db.Column(db.Enum("report", "forecast", name="entry_type_enum"),nullable=False) # "report" or "forecast"
+    entry_type = db.Column(
+        db.Enum("report", "forecast", name="entry_type_enum"), nullable=False
+    )  # "report" or "forecast"
 
     report_time = db.Column(db.DateTime, nullable=False)
-    forecast_time = db.Column(db.DateTime, nullable=True) # nullable true
+    forecast_time = db.Column(db.DateTime, nullable=True)  # nullable true
 
     temperature = db.Column(db.Float, nullable=False)
-    humidity = db.Column(db.Integer,db.CheckConstraint("humidity BETWEEN 0 AND 100"))
-    wind_speed = db.Column(db.Float,db.CheckConstraint("wind_speed >= 0"))
-    cloud_cover = db.Column(db.Integer,db.CheckConstraint("cloud_cover BETWEEN 0 AND 100"))
+    humidity = db.Column(db.Integer, db.CheckConstraint("humidity BETWEEN 0 AND 100"))
+    wind_speed = db.Column(db.Float, db.CheckConstraint("wind_speed >= 0"))
+    cloud_cover = db.Column(
+        db.Integer, db.CheckConstraint("cloud_cover BETWEEN 0 AND 100")
+    )
     rain = db.Column(db.Boolean, nullable=False)
     fog = db.Column(db.Boolean, nullable=False)
 
-    location = db.relationship(
-        "Location",
-        back_populates="weather_reports"
-    )
+    location = db.relationship("Location", back_populates="weather_reports")
 
     def __repr__(self):
         return f"<WeatherReport {self.entry_type} for {self.location.id} at {self.report_time}>"
-    
-    #todo
-    def serialize(self):
-        pass
 
-    #todo
-    def deserialize(self):
-        pass
-    
-    #todo
+    def serialize(self):
+        return {
+            "report_id": self.report_id,
+            "location_id": self.location_id,
+            "entry_type": self.entry_type,
+            "report_time": self.report_time,
+            "forecast_time": self.forecast_time,
+            "temperature": self.temperature,
+            "humidity": self.humidity,
+            "wind_speed": self.wind_speed,
+            "cloud_cover": self.cloud_cover,
+            "rain": self.rain,
+            "fog": self.fog,
+        }
+
+    def deserialize(self, cls, data, location_id, entry_type="report"):
+        """Create a WeatherReport instance from JSON data."""
+        return cls(
+            location_id=location_id,
+            entry_type=entry_type,
+            report_time=data["report_time"],
+            forecast_time=data.get("forecast_time"),
+            temperature=data["temperature"],
+            humidity=data["humidity"],
+            wind_speed=data["wind_speed"],
+            cloud_cover=data["cloud_cover"],
+            rain=data["rain"],
+            fog=data["fog"],
+        )
+
     @staticmethod
     def json_schema():
-        pass
+        schema = {
+            "type": "object",
+            "required": [
+                "report_time",
+                "temperature",
+                "humidity",
+                "wind_speed",
+                "cloud_cover",
+                "rain",
+                "fog",
+            ],
+        }
+        props = schema["properties"] = {}
+        props["report_time"] = {
+            "description": "The time the report was made",
+            "type": "string",
+            "format": "date-time",
+        }
+        props["forecast_time"] = {
+            "description": "The time the forecast is for (only for forecasts)",
+            "type": "string",
+            "format": "date-time",
+        }
+        props["temperature"] = {
+            "description": "Temperature in Celsius",
+            "type": "number",
+        }
+        props["humidity"] = {
+            "description": "Humidity percentage",
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 100,
+        }
+        props["wind_speed"] = {
+            "description": "Wind speed in m/s",
+            "type": "number",
+            "minimum": 0,
+        }
+        props["cloud_cover"] = {
+            "description": "Cloud cover percentage",
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 100,
+        }
+        props["rain"] = {"description": "Whether it is raining", "type": "boolean"}
+        props["fog"] = {"description": "Whether it is foggy", "type": "boolean"}
+        return schema
