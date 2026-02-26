@@ -1,8 +1,26 @@
 from werkzeug.exceptions import NotFound
 from werkzeug.routing import BaseConverter
+
+from weatherradar.models import Location
 from weatherradar.models import WeatherReport
 
 
+class LocationConverter(BaseConverter):
+
+    def to_python(self, value):
+        try:
+            location_id = int(value)
+        except ValueError:
+            raise NotFound(description="Invalid location ID format")
+        
+        location = Location.query.filter_by(location_id=location_id).first()
+        if not location:
+           raise NotFound(description="Location not found")
+        return location
+    
+    def to_url(self, value):
+        return str(value.location_id)
+    
 class ForecastConverter(BaseConverter):
     """Custom URL converter to fetch WeatherReport forecasts by ID."""
 
