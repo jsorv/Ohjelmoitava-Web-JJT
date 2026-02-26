@@ -8,8 +8,9 @@ from weatherradar.models import Location
 from weatherradar import db
 
 class Locations(Resource):
-
+    
     def get(self):
+        """Get all locations."""
         response_data = []
         locations = Location.query.all()
         for location in locations:
@@ -17,8 +18,9 @@ class Locations(Resource):
         return response_data
 
     def post(self):
+        """Create a new location."""
         if not request.json:
-            raise UnsupportedMediaType
+            raise UnsupportedMediaType(description="Request body must be JSON")
         try:
             validate(request.json, Location.json_schema())
         except ValidationError as e:
@@ -26,6 +28,7 @@ class Locations(Resource):
 
         location = Location()
         location.deserialize(request.json)
+
         try:
             db.session.add(location)
             db.session.commit()
@@ -38,17 +41,22 @@ class Locations(Resource):
                 )
             )
 
-        return Response(status=201)
+        return Response(
+            status=201,
+            headers={"Location": url_for("locationitem", location=location)}
+        )
 
 
 class LocationItem(Resource):
 
     def get(self, location):
+        """Get a single location."""
         return location.serialize()
 
     def put(self, location):
+        """Update an existing location."""
         if not request.json:
-            raise UnsupportedMediaType
+            raise UnsupportedMediaType(description="Request body must be JSON")
         try:
             validate(request.json, Location.json_schema())
         except ValidationError as e:
@@ -68,6 +76,7 @@ class LocationItem(Resource):
         return Response(status=204)
 
     def delete(self, location):
+        """Delete an existing location."""
         db.session.delete(location)
         db.session.commit()
         return Response(status=204)
