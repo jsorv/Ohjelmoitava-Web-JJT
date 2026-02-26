@@ -76,20 +76,17 @@ class WeatherReport(db.Model):
             "fog": self.fog,
         }
 
-    def deserialize(self, cls, data, location_id, entry_type="report"):
-        """Create a WeatherReport instance from JSON data."""
-        return cls(
-            location_id=location_id,
-            entry_type=entry_type,
-            report_time=data["report_time"],
-            forecast_time=data.get("forecast_time"),
-            temperature=data["temperature"],
-            humidity=data["humidity"],
-            wind_speed=data["wind_speed"],
-            cloud_cover=data["cloud_cover"],
-            rain=data["rain"],
-            fog=data["fog"],
-        )
+    def deserialize(self, data, location_id, entry_type="report"):
+        self.location_id = location_id
+        self.entry_type = entry_type
+        self.report_time = data["report_time"]
+        self.forecast_time = data.get("forecast_time")
+        self.temperature = data["temperature"]
+        self.humidity = data["humidity"]
+        self.wind_speed = data["wind_speed"]
+        self.cloud_cover = data["cloud_cover"]
+        self.rain = data["rain"]
+        self.fog = data["fog"]
 
     @staticmethod
     def json_schema():
