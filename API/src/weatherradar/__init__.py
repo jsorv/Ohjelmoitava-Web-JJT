@@ -1,6 +1,7 @@
 import os
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
+from weatherradar.utils import ForecastConverter
 
 db = SQLAlchemy()
 
@@ -27,4 +28,7 @@ def create_app(test_config=None):
         pass
 
     db.init_app(app)
+
+    app.url_map.converters["forecast"] = ForecastConverter
+
     return app
