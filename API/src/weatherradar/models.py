@@ -62,8 +62,8 @@ class Location(db.Model):
         props["longitude"] = {
             "description": "Geographic longitude",
             "type": "number",
-            "minimum": -90,
-            "maximum": 90,
+            "minimum": -180,
+            "maximum": 180,
         }
         return schema
 
