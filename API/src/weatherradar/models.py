@@ -18,18 +18,55 @@ class Location(db.Model):
     def __repr__(self):
         return f"<Location {self.city}, {self.country}>"
 
-    # todo
     def serialize(self):
-        pass
+        return {
+            "location_id": self.location_id,
+            "country": self.country,
+            "city": self.city,
+            "latitude": self.latitude,
+            "longitude": self.longitude
+        }
 
-    # todo
-    def deserialize(self):
-        pass
+    def deserialize(self, doc):
+        self.country = doc["country"]
+        self.city = doc["city"]
+        self.latitude = doc["latitude"]
+        self.longitude = doc["longitude"]
 
-    # todo
     @staticmethod
     def json_schema():
-        pass
+        schema = {
+            "type": "object",
+            "required": [
+                "country",
+                "city",
+                "latitude",
+                "longitude",
+            ],
+        }
+        props = schema["properties"] = {}
+        props["country"] = {
+            "description": "Name of location (country)",
+            "type": "string"
+        }
+        props["city"] = {
+            "description": "Name of location (city)",
+            "type": "string"
+        }
+        props["latitude"] = {
+            "description": "Geographic latitude",
+            "type": "number",
+            "minimum": -90,
+            "maximum": 90,
+        }
+        props["longitude"] = {
+            "description": "Geographic longitude",
+            "type": "number",
+            "minimum": -90,
+            "maximum": 90,
+        }
+        return schema
+
 
 
 class WeatherReport(db.Model):
