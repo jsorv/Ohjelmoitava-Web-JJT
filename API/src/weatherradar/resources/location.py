@@ -8,9 +8,13 @@ from API.src.weatherradar.models import Location
 from API.src.weatherradar import db
 
 class Locations(Resource):
+    """Resource for managing locations."""
     
     def get(self):
-        """Get all locations."""
+        """Get all locations.
+
+        Returns a list of forecasts for the specified location.
+        """
         response_data = []
         locations = Location.query.all()
         for location in locations:
@@ -18,7 +22,11 @@ class Locations(Resource):
         return response_data
 
     def post(self):
-        """Create a new location."""
+        """Create a new location.
+
+        The request body must be a JSON object containing the location data.
+        Returns a 201 Created response with a Location header pointing to the new location.
+        """
         if not request.json:
             raise UnsupportedMediaType(description="Request body must be JSON")
         try:
@@ -48,13 +56,22 @@ class Locations(Resource):
 
 
 class LocationItem(Resource):
+    """Resource for managing a specific location."""
 
     def get(self, location):
-        """Get a single location."""
+        """Get a single location.
+        Parameters:
+            location (Location): The location to retrieve.
+        """
         return location.serialize()
 
     def put(self, location):
-        """Update an existing location."""
+        """Update an existing location.
+        Parameters:
+            location (Location): The location to update.
+        The request body must be a JSON object containing the updated location data.
+        Returns a 204 No Content response if the update is successful.
+        """
         if not request.json:
             raise UnsupportedMediaType(description="Request body must be JSON")
         try:
@@ -76,7 +93,11 @@ class LocationItem(Resource):
         return Response(status=204)
 
     def delete(self, location):
-        """Delete an existing location."""
+        """Delete an existing location.
+        Parameters:
+            location (Location): The location to delete.
+        Returns a 204 No Content response if the deletion is successful.
+        """
         db.session.delete(location)
         db.session.commit()
         return Response(status=204)
