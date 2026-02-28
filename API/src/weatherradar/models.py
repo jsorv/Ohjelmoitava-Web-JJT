@@ -1,4 +1,8 @@
+from datetime import datetime
+from email.utils import parsedate_to_datetime
+
 from . import db
+
 
 class Location(db.Model):
     __tablename__ = "locations"
@@ -23,7 +27,7 @@ class Location(db.Model):
             "country": self.country,
             "city": self.city,
             "latitude": self.latitude,
-            "longitude": self.longitude
+            "longitude": self.longitude,
         }
 
     def deserialize(self, doc):
@@ -46,12 +50,9 @@ class Location(db.Model):
         props = schema["properties"] = {}
         props["country"] = {
             "description": "Name of location (country)",
-            "type": "string"
+            "type": "string",
         }
-        props["city"] = {
-            "description": "Name of location (city)",
-            "type": "string"
-        }
+        props["city"] = {"description": "Name of location (city)", "type": "string"}
         props["latitude"] = {
             "description": "Geographic latitude",
             "type": "number",
@@ -67,9 +68,13 @@ class Location(db.Model):
         return schema
 
 
-
 class WeatherReport(db.Model):
     __tablename__ = "weather_reports"
+    __table_args__ = (
+        db.UniqueConstraint(
+            "location_id", "forecast_time", name="uq_location_forecast_time"
+        ),
+    )
 
     report_id = db.Column(db.Integer, primary_key=True)
     location_id = db.Column(
@@ -102,8 +107,10 @@ class WeatherReport(db.Model):
             "report_id": self.report_id,
             "location_id": self.location_id,
             "entry_type": self.entry_type,
-            "report_time": self.report_time,
-            "forecast_time": self.forecast_time,
+            "report_time": self.report_time.isoformat(),
+            "forecast_time": (
+                self.forecast_time.isoformat() if self.forecast_time else None
+            ),
             "temperature": self.temperature,
             "humidity": self.humidity,
             "wind_speed": self.wind_speed,
@@ -115,8 +122,10 @@ class WeatherReport(db.Model):
     def deserialize(self, data, location_id, entry_type="report"):
         self.location_id = location_id
         self.entry_type = entry_type
-        self.report_time = data["report_time"]
+        self.report_time = parsedate_to_datetime(data["report_time"])
         self.forecast_time = data.get("forecast_time")
+        if self.forecast_time:
+            self.forecast_time = parsedate_to_datetime(self.forecast_time)
         self.temperature = data["temperature"]
         self.humidity = data["humidity"]
         self.wind_speed = data["wind_speed"]

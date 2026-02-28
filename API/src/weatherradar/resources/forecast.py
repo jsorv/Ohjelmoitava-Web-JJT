@@ -11,10 +11,10 @@ from API.src.weatherradar import db
 
 class WeatherForecasts(Resource):
 
-    def get(self, location_route):
+    def get(self, location):
         """Get all forecasts for a location."""
         forecasts = WeatherReport.query.filter_by(
-            location_id=location_route.location_id, entry_type="forecast"
+            location_id=location.location_id, entry_type="forecast"
         ).all()
         return Response(
             response=json.dumps([f.serialize() for f in forecasts]),
@@ -22,7 +22,7 @@ class WeatherForecasts(Resource):
             status=200,
         )
 
-    def post(self, location_route):
+    def post(self, location):
         """Create a new forecast for a location."""
         if not request.json:
             raise UnsupportedMediaType(description="Request body must be JSON")
@@ -32,9 +32,8 @@ class WeatherForecasts(Resource):
         except ValidationError as e:
             raise BadRequest(description=str(e)) from e
 
-        forecast = WeatherReport.deserialize(
-            request.json, location_route.location_id, entry_type="forecast"
-        )
+        forecast = WeatherReport()
+        forecast.deserialize(request.json, location.location_id, entry_type="forecast")
         try:
             db.session.add(forecast)
             db.session.commit()
@@ -45,16 +44,20 @@ class WeatherForecasts(Resource):
 
         return Response(
             status=201,
-            headers={"Location": url_for("api.weatherforecastitem", forecast=forecast)},
+            headers={
+                "Location": url_for(
+                    "api.weatherforecastitem", location=location, forecast=forecast
+                )
+            },
         )
 
 
 class WeatherForecastItem(Resource):
 
-    def get(self, forecast_route):
-        return forecast_route.serialize()
+    def get(self, location, forecast):
+        return forecast.serialize()
 
-    def put(self, forecast_route):
+    def put(self, location, forecast):
         if not request.json:
             raise UnsupportedMediaType(description="Request body must be JSON")
         try:
@@ -64,25 +67,28 @@ class WeatherForecastItem(Resource):
 
         if request.json.get("forecast_time") is None:
             raise BadRequest(description="Missing required field: forecast_time")
-        if request.json["forecast_time"] != forecast_route.forecast_time:
-            raise BadRequest(description="forecast_time in URL and body must match")
 
-        forecast_route.deserialize(
-            request.json, forecast_route.location_id, entry_type="forecast"
-        )
+        forecast.deserialize(request.json, location.location_id, entry_type="forecast")
+
         try:
-            db.session.add(forecast_route)
+            db.session.add(forecast)
             db.session.commit()
         except IntegrityError:
-            raise Conflict(description="A forecast for this time already exists.")
+            raise Conflict(
+                description="A forecast for this '{forecast_time}, {location_id}' already exists.".format(
+                    **request.json
+                )
+            )
         return Response(
-            status=201,
+            status=204,
             headers={
-                "Location": url_for("api.weatherforecastitem", forecast=forecast_route)
+                "Location": url_for(
+                    "api.weatherforecastitem", location=location, forecast=forecast
+                )
             },
         )
 
-    def delete(self, forecast_route):
-        db.session.delete(forecast_route)
+    def delete(self, location, forecast):
+        db.session.delete(forecast)
         db.session.commit()
         return Response(status=204)
