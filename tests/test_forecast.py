@@ -31,7 +31,7 @@ def _populate_db():
     )
     forecast1 = WeatherReport(
         location=location,
-        locatrion_id=location.location_id,
+        location_id=location.location_id,
         entry_type="forecast",
         report_time=datetime.now().isoformat(),
         forecast_time=(datetime.now() + timedelta(hours=1)).isoformat(),
@@ -44,7 +44,7 @@ def _populate_db():
     )
     forecast2 = WeatherReport(
         location=location,
-        locatrion_id=location.location_id,
+        location_id=location.location_id,
         entry_type="forecast",
         report_time=datetime.now().isoformat(),
         forecast_time=(datetime.now() + timedelta(hours=2)).isoformat(),
@@ -57,7 +57,7 @@ def _populate_db():
     )
     forecarst3 = WeatherReport(
         location=location,
-        locatrion_id=location.location_id,
+        location_id=location.location_id,
         entry_type="forecast",
         report_time=datetime.now().isoformat(),
         forecast_time=(datetime.now() + timedelta(hours=3)).isoformat(),
