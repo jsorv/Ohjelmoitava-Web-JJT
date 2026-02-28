@@ -92,9 +92,9 @@ class TestLocation(object):
     def test_post_conflict(self, client):
         valid = {
             "country": "Finland",
-            "city": "Oulu",
-            "latitude": 65.01,
-            "longitude": 25.46
+            "city": "Helsinki",  # already exists as location 2
+            "latitude": 60.16,
+            "longitude": 24.93
         }
 
         resp = client.post(self.RESOURCE_URL, json=valid)
@@ -140,9 +140,9 @@ class TestLocationItem(object):
     def test_put_conflict(self, client):
         valid = {
             "country": "Finland",
-            "city": "Oulu",
-            "latitude": 65.01,
-            "longitude": 25.46
+            "city": "Helsinki",  # already exists as location 2
+            "latitude": 60.16,
+            "longitude": 24.93
         }
 
         resp = client.put(self.RESOURCE_URL, json=valid)

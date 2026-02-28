@@ -1,6 +1,5 @@
 from . import db
 
-
 class Location(db.Model):
     __tablename__ = "locations"
     __table_args__ = (db.UniqueConstraint("country", "city", name="uq_country_city"),)
