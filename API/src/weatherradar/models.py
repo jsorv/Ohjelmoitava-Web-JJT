@@ -4,6 +4,8 @@ from . import db
 
 
 class Location(db.Model):
+    """Model representing a geographic location."""
+
     __tablename__ = "locations"
     __table_args__ = (db.UniqueConstraint("country", "city", name="uq_country_city"),)
 
@@ -18,9 +20,11 @@ class Location(db.Model):
     )
 
     def __repr__(self):
+        """String representation of the Location model."""
         return f"<Location {self.city}, {self.country}>"
 
     def serialize(self):
+        """Serializes the Location object to a dictionary."""
         return {
             "location_id": self.location_id,
             "country": self.country,
@@ -30,6 +34,7 @@ class Location(db.Model):
         }
 
     def deserialize(self, doc):
+        """Deserializes a dictionary to populate the Location object."""
         self.country = doc["country"]
         self.city = doc["city"]
         self.latitude = doc["latitude"]
@@ -37,6 +42,7 @@ class Location(db.Model):
 
     @staticmethod
     def json_schema():
+        """Returns the JSON schema for the Location model."""
         schema = {
             "type": "object",
             "required": [
@@ -68,6 +74,8 @@ class Location(db.Model):
 
 
 class WeatherReport(db.Model):
+    """Model representing a weather report or forecast for a specific location."""
+
     __tablename__ = "weather_reports"
     __table_args__ = (
         db.UniqueConstraint(
@@ -99,9 +107,11 @@ class WeatherReport(db.Model):
     location = db.relationship("Location", back_populates="weather_reports")
 
     def __repr__(self):
+        """String representation of the WeatherReport model."""
         return f"<WeatherReport {self.entry_type} for {self.location.id} at {self.report_time}>"
 
     def serialize(self):
+        """Serializes the WeatherReport object to a dictionary."""
         return {
             "report_id": self.report_id,
             "location_id": self.location_id,
@@ -119,6 +129,7 @@ class WeatherReport(db.Model):
         }
 
     def deserialize(self, data, location_id, entry_type="report"):
+        """Deserializes a dictionary to populate the WeatherReport object."""
         self.location_id = location_id
         self.entry_type = entry_type
         self.report_time = parsedate_to_datetime(data["report_time"])
@@ -134,6 +145,7 @@ class WeatherReport(db.Model):
 
     @staticmethod
     def json_schema():
+        """Returns the JSON schema for the WeatherReport model."""
         schema = {
             "type": "object",
             "required": [

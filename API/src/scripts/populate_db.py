@@ -5,6 +5,7 @@ from ..weatherradar import db, create_app
 def create_location(
     country: str, city: str, latitude: float, longitude: float
 ) -> "Location":
+    """Creates a location if it doesn't exist, otherwise returns the existing one."""
     loc = Location.query.filter_by(country=country, city=city).first()
     if loc:
         return loc
@@ -26,7 +27,7 @@ def add_weather_report(
     rain: bool,
     fog: bool,
 ) -> "WeatherReport":
-
+    """Adds a weather report to the database."""
     report = WeatherReport(
         location_id=location.location_id,
         entry_type=entry_type,

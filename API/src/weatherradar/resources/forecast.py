@@ -10,9 +10,15 @@ from API.src.weatherradar import db
 
 
 class WeatherForecasts(Resource):
+    """Resource for managing weather forecasts for a specific location."""
 
     def get(self, location):
-        """Get all forecasts for a location."""
+        """Get all forecasts for a location.
+
+        Parameters:
+            location (Location): The location for which to retrieve forecasts.
+            Returns a list of forecasts for the specified location.
+        """
         forecasts = WeatherReport.query.filter_by(
             location_id=location.location_id, entry_type="forecast"
         ).all()
@@ -23,7 +29,12 @@ class WeatherForecasts(Resource):
         )
 
     def post(self, location):
-        """Create a new forecast for a location."""
+        """Create a new forecast for a location.
+        Parameters:
+            location (Location): The location for which to create a forecast.
+            The request body must be a JSON object containing the forecast data.
+            Returns a 201 Created response with a Location header pointing to the new forecast.
+        """
         if not request.json:
             raise UnsupportedMediaType(description="Request body must be JSON")
 
@@ -53,11 +64,25 @@ class WeatherForecasts(Resource):
 
 
 class WeatherForecastItem(Resource):
+    """Resource for managing a specific weather forecast."""
 
     def get(self, location, forecast):
+        """Get a specific forecast for a location.
+        Parameters:
+            location (Location): The location for which to retrieve the forecast.
+            forecast (WeatherReport): The specific forecast to retrieve.
+        """
         return forecast.serialize()
 
     def put(self, location, forecast):
+        """Update a specific forecast for a location.
+        Parameters:
+            location (Location): The location for which to update the forecast.
+            forecast (WeatherReport): The specific forecast to update.
+            The request body must be a JSON object containing the updated forecast data.
+            Forecast time is required for updates.
+            Returns a 204 No Content response if the update is successful.
+        """
         if not request.json:
             raise UnsupportedMediaType(description="Request body must be JSON")
         try:
@@ -89,6 +114,12 @@ class WeatherForecastItem(Resource):
         )
 
     def delete(self, location, forecast):
+        """Delete a specific forecast for a location.
+        Parameters:
+            location (Location): The location for which to delete the forecast.
+            forecast (WeatherReport): The specific forecast to delete.
+            Returns a 204 No Content response if the deletion is successful.
+        """
         db.session.delete(forecast)
         db.session.commit()
         return Response(status=204)

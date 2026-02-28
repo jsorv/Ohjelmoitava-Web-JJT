@@ -4,9 +4,11 @@ from flask_sqlalchemy import SQLAlchemy
 
 db = SQLAlchemy()
 
+
 # Based on http://flask.pocoo.org/docs/1.0/tutorial/factory/#the-application-factory
 # Modified to use Flask SQLAlchemy
 def create_app(test_config=None):
+    """Application factory function for the weather radar API."""
     app = Flask(__name__, instance_relative_config=True)
     app.config.from_mapping(
         SECRET_KEY="dev",
