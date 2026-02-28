@@ -43,9 +43,8 @@ class WeatherForecasts(Resource):
             raise Conflict(description="A forecast for this time already exists.")
 
         return Response(
-            response=json.dumps(forecast.serialize()),
-            mimetype="application/json",
             status=201,
+            headers={"Location": url_for("api.weatherforecastitem", forecast=forecast)},
         )
 
 
@@ -76,8 +75,6 @@ class WeatherForecastItem(Resource):
         except IntegrityError:
             raise Conflict(description="A forecast for this time already exists.")
         return Response(
-            response=json.dumps(forecast_route.serialize()),
-            mimetype="application/json",
             status=201,
             headers={
                 "Location": url_for("api.weatherforecastitem", forecast=forecast_route)
