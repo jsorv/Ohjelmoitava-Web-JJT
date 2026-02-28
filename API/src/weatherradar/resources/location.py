@@ -43,7 +43,7 @@ class Locations(Resource):
 
         return Response(
             status=201,
-            headers={"Location": url_for("locationitem", location=location)}
+            headers={"Location": url_for("api.locationitem", location=location)}
         )
 
 
