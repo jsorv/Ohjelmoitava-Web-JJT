@@ -1,10 +1,10 @@
 from datetime import datetime, timedelta
-from src.weatherradar.models import db, app, Location, WeatherReport
+from ..weatherradar import db, create_app
 
 
 def create_location(
     country: str, city: str, latitude: float, longitude: float
-) -> Location:
+) -> "Location":
     loc = Location.query.filter_by(country=country, city=city).first()
     if loc:
         return loc
@@ -15,7 +15,7 @@ def create_location(
 
 
 def add_weather_report(
-    location: Location,
+    location: "Location",
     entry_type: str,
     report_time: datetime,
     forecast_time: datetime | None,
@@ -25,7 +25,7 @@ def add_weather_report(
     cloud_cover: int,
     rain: bool,
     fog: bool,
-) -> WeatherReport:
+) -> "WeatherReport":
 
     report = WeatherReport(
         location_id=location.location_id,
@@ -45,6 +45,17 @@ def add_weather_report(
 
 
 if __name__ == "__main__":
+    app = create_app()
+    # Ensure models are imported after the app (and db) are available
+    from ..weatherradar import models
+
+    Location = models.Location
+    WeatherReport = models.WeatherReport
+
+    context = app.app_context()
+    context.push()
+    db.create_all()
+    context.pop()
     with app.app_context():
         oulu = create_location("Finland", "Oulu", 65.0121, 25.4651)
         helsinki = create_location("Finland", "Helsinki", 60.1699, 24.9384)
