@@ -3,8 +3,8 @@ from flask_restful import Resource
 from sqlalchemy.exc import IntegrityError
 from jsonschema import validate
 
-from weatherradar.models import WeatherReport
-from weatherradar import db
+from API.src.weatherradar.models import WeatherReport
+from API.src.weatherradar import db
 
 class WeatherReports(Resource):
 

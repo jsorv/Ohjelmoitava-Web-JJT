@@ -1,11 +1,12 @@
 from flask import request, Response, url_for
 from flask_restful import Resource
 from sqlalchemy.exc import IntegrityError
-from weatherradar.models import WeatherReport
-from weatherradar import db
 from werkzeug.exceptions import BadRequest, UnsupportedMediaType, NotFound, Conflict
 from jsonschema import validate, ValidationError
 import json
+
+from API.src.weatherradar.models import WeatherReport
+from API.src.weatherradar import db
 
 
 class WeatherForecasts(Resource):

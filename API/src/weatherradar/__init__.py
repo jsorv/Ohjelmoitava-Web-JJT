@@ -28,10 +28,13 @@ def create_app(test_config=None):
     db.init_app(app)
 
     # import here
+    from .api import api_bp
     from .utils import LocationConverter
     from .utils import ForecastConverter
 
     app.url_map.converters["location"] = LocationConverter
     app.url_map.converters["forecast"] = ForecastConverter
+
+    app.register_blueprint(api_bp)
 
     return app

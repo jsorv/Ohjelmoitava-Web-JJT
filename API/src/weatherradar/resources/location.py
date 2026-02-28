@@ -4,8 +4,8 @@ from jsonschema import ValidationError, validate
 from sqlalchemy.exc import IntegrityError
 from werkzeug.exceptions import BadRequest, Conflict, UnsupportedMediaType
 
-from weatherradar.models import Location
-from weatherradar import db
+from API.src.weatherradar.models import Location
+from API.src.weatherradar import db
 
 class Locations(Resource):
     

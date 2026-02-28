@@ -4,7 +4,6 @@ from werkzeug.routing import BaseConverter
 from .models import Location
 from .models import WeatherReport
 
-
 class LocationConverter(BaseConverter):
 
     def to_python(self, value):
