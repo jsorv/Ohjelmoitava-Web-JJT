@@ -12,9 +12,11 @@ license = "MIT"
 authors = [ { name = "Ohjelmoitava Web JJT" } ]
 
 dependencies = [
-	"Flask>=2.0",
-	"Flask-SQLAlchemy>=3.0",
-	"Flask-RESTful>=0.3"
+	"flask",
+    "flask-restful",
+    "flask-sqlalchemy",
+    "jsonschema",
+    "SQLAlchemy",
 ]
 
 [tool.setuptools.packages.find]
