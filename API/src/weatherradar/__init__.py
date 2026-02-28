@@ -1,12 +1,8 @@
 import os
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
-from weatherradar.utils import LocationConverter
-from weatherradar.utils import ForecastConverter
-
 
 db = SQLAlchemy()
-
 
 # Based on http://flask.pocoo.org/docs/1.0/tutorial/factory/#the-application-factory
 # Modified to use Flask SQLAlchemy
@@ -30,6 +26,10 @@ def create_app(test_config=None):
         pass
 
     db.init_app(app)
+
+    # import here
+    from .utils import LocationConverter
+    from .utils import ForecastConverter
 
     app.url_map.converters["location"] = LocationConverter
     app.url_map.converters["forecast"] = ForecastConverter

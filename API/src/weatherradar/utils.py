@@ -1,8 +1,8 @@
 from werkzeug.exceptions import NotFound
 from werkzeug.routing import BaseConverter
 
-from weatherradar.models import Location
-from weatherradar.models import WeatherReport
+from .models import Location
+from .models import WeatherReport
 
 
 class LocationConverter(BaseConverter):

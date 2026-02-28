@@ -1,9 +1,9 @@
 from flask import Blueprint
 from flask_restful import Api
 
-from weatherradar.resources.location import Locations, LocationItem
-from weatherradar.resources.forecast import WeatherForecasts, WeatherForecastItem
-from weatherradar.resources.report import WeatherReports, WeatherReportItem
+from .resources.location import Locations, LocationItem
+from .resources.forecast import WeatherForecasts, WeatherForecastItem
+from .resources.report import WeatherReports, WeatherReportItem
 
 # from . import views
 
