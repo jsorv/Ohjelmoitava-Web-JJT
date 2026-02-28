@@ -1,6 +1,6 @@
-import datetime
 import json
 import pytest
+from datetime import datetime, timedelta
 from API.src.weatherradar import db, create_app
 from API.src.weatherradar.models import WeatherReport, Location
 
@@ -33,8 +33,8 @@ def _populate_db():
         location=location,
         locatrion_id=location.location_id,
         entry_type="forecast",
-        report_time=datetime.utcnow().isoformat(),
-        forecast_time=(datetime.utcnow() + datetime.timedelta(hours=1)).isoformat(),
+        report_time=datetime.now().isoformat(),
+        forecast_time=(datetime.now() + timedelta(hours=1)).isoformat(),
         temperature=20.5,
         humidity=60,
         wind_speed=5.0,
@@ -46,8 +46,8 @@ def _populate_db():
         location=location,
         locatrion_id=location.location_id,
         entry_type="forecast",
-        report_time=datetime.utcnow().isoformat(),
-        forecast_time=(datetime.utcnow() + datetime.timedelta(hours=2)).isoformat(),
+        report_time=datetime.now().isoformat(),
+        forecast_time=(datetime.now() + timedelta(hours=2)).isoformat(),
         temperature=18.0,
         humidity=70,
         wind_speed=3.0,
@@ -59,8 +59,8 @@ def _populate_db():
         location=location,
         locatrion_id=location.location_id,
         entry_type="forecast",
-        report_time=datetime.utcnow().isoformat(),
-        forecast_time=(datetime.utcnow() + datetime.timedelta(hours=3)).isoformat(),
+        report_time=datetime.now().isoformat(),
+        forecast_time=(datetime.now() + timedelta(hours=3)).isoformat(),
         temperature=22.0,
         humidity=55,
         wind_speed=4.0,
@@ -76,8 +76,8 @@ def _get_valid_weather_forecast():
     return {
         "location_id": 1,
         "entry_type": "forecast",
-        "report_time": datetime.utcnow().isoformat(),
-        "forecast_time": (datetime.utcnow() + datetime.timedelta(hours=4)).isoformat(),
+        "report_time": datetime.now().isoformat(),
+        "forecast_time": (datetime.now() + timedelta(hours=4)).isoformat(),
         "temperature": 20.5,
         "humidity": 60,
         "wind_speed": 5.0,
@@ -162,9 +162,7 @@ class TestForecastItem(object):
 
     def test_put_valid(self, client):
         valid = _get_valid_weather_forecast()
-        valid["forecast_time"] = (
-            datetime.utcnow() + datetime.timedelta(hours=1)
-        ).isoformat()
+        valid["forecast_time"] = (datetime.now() + timedelta(hours=1)).isoformat()
         response = client.put(self.RESOURCE_URL, json=valid)
         assert response.status_code == 201
 
@@ -192,8 +190,6 @@ class TestForecastItem(object):
 
     def test_put_conflict(self, client):
         valid = _get_valid_weather_forecast()
-        valid["forecast_time"] = (
-            datetime.utcnow() + datetime.timedelta(hours=2)
-        ).isoformat()
+        valid["forecast_time"] = (datetime.now() + timedelta(hours=2)).isoformat()
         response = client.put(self.RESOURCE_URL, json=valid)
         assert response.status_code == 409
