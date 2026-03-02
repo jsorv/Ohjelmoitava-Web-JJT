@@ -1,8 +1,18 @@
+import datetime
 from email.utils import parsedate_to_datetime
-from dateutil.parser import isoparse
 from sqlalchemy import text
+from datetime import datetime
 
 from . import db
+
+# from AI def parse_datetime(value):
+def parse_datetime(value):
+    if value is None:
+        return None
+    try:
+        return datetime.fromisoformat(value.replace("Z", "+00:00"))
+    except ValueError:
+        return parsedate_to_datetime(value)
 
 
 class Location(db.Model):
@@ -137,13 +147,14 @@ class WeatherReport(db.Model):
         }
         
     def deserialize(self, data, location_id, entry_type="report"):
-        """Deserializes a dictionary to populate the WeatherReport object."""
         self.location_id = location_id
         self.entry_type = entry_type
-        self.report_time = isoparse(data["report_time"])
-        self.forecast_time = data.get("forecast_time")
-        if self.forecast_time:
-            self.forecast_time = isoparse(self.forecast_time)
+
+        self.report_time = parse_datetime(data["report_time"])
+
+        ft = data.get("forecast_time")
+        self.forecast_time = parse_datetime(ft) if ft else None
+
         self.temperature = data["temperature"]
         self.humidity = data["humidity"]
         self.wind_speed = data["wind_speed"]
@@ -201,3 +212,5 @@ class WeatherReport(db.Model):
         props["rain"] = {"description": "Whether it is raining", "type": "boolean"}
         props["fog"] = {"description": "Whether it is foggy", "type": "boolean"}
         return schema
+    
+    

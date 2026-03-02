@@ -1,6 +1,6 @@
 import json
 import pytest
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from API.src.weatherradar import db, create_app
 from API.src.weatherradar.models import WeatherReport, Location
 
@@ -80,7 +80,7 @@ def _get_valid_weather_forecast():
         "location_id": 1,
         "entry_type": "forecast",
         "report_time": datetime.now(),
-        "forecast_time": (datetime.now() + timedelta(hours=4)),
+        "forecast_time": datetime.now(timezone.utc).isoformat(),
         "temperature": 20.5,
         "humidity": 60,
         "wind_speed": 5.0,
@@ -93,7 +93,7 @@ def _get_valid_weather_forecast():
 class TestForecast(object):
     """Test suite for the WeatherForecasts and WeatherForecastItem resources."""
 
-    RESOURCE_URL = "weatherradar/api/locations/1/forecasts/"
+    RESOURCE_URL = "/weatherradar/api/locations/1/forecasts/"
 
     def test_get(self, client):
         """Test retrieving all forecasts for a location."""
@@ -170,8 +170,8 @@ class TestForecast(object):
 
 class TestForecastItem(object):
 
-    RESOURCE_URL = "weatherradar/api/locations/1/forecasts/1/"
-    INVALID_URL = "weatherradar/api/locations/1/forecasts/999/"
+    RESOURCE_URL = "/weatherradar/api/locations/1/forecasts/1/"
+    INVALID_URL = "/weatherradar/api/locations/1/forecasts/999/"
 
     def test_get(self, client):
         """Test retrieving a specific forecast for a location."""

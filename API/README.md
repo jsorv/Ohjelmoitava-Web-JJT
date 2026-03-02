@@ -9,6 +9,7 @@ This is an information storage API for weather station data
     - flask-sqlalchemy
     - jsonschema
     - SQLAlchemy
+    - python-dateutil
 
 **Setup framework**
 
