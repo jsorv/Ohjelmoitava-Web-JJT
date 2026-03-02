@@ -45,3 +45,24 @@ class ForecastConverter(BaseConverter):
     def to_url(self, value):
         """Converts a WeatherReport object back to a URL component."""
         return str(value.report_id)
+    
+class ReportConverter(BaseConverter):
+    """Custom URL converter to fetch WeatherReport reports by ID."""
+
+    def to_python(self, value):
+        """Fetches a WeatherReport report by its report_id."""
+        try:
+            report_id = int(value)
+        except ValueError:
+            raise NotFound(description="Invalid report ID format")
+
+        report = WeatherReport.query.filter_by(
+            report_id=report_id, entry_type="report"
+        ).first()
+        if not report:
+            raise NotFound(description="Report not found")
+        return report
+
+    def to_url(self, value):
+        """Converts a WeatherReport object back to a URL component."""
+        return str(value.report_id)

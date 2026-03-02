@@ -33,9 +33,11 @@ def create_app(test_config=None):
     from .api import api_bp
     from .utils import LocationConverter
     from .utils import ForecastConverter
+    from .utils import ReportConverter
 
     app.url_map.converters["location"] = LocationConverter
     app.url_map.converters["forecast"] = ForecastConverter
+    app.url_map.converters["report"] = ReportConverter
 
     app.register_blueprint(api_bp)
 

@@ -3,7 +3,7 @@
 # Group information
 * Student 1. Jaakko Hietikko jhietikk22@student.oulu.fi
 * Student 2. Teemu Kulojärvi tkulojar20@student.oulu.fi
-* Student 3. Name and email
+* Student 3. Jenna Sorvoja jsorvoja21@student.oulu.fi
 * Student 4. Name and email
 
 
