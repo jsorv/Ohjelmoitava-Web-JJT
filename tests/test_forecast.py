@@ -1,6 +1,6 @@
 import json
 import pytest
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timedelta
 from API.src.weatherradar import db, create_app
 from API.src.weatherradar.models import WeatherReport, Location
 
@@ -80,7 +80,7 @@ def _get_valid_weather_forecast():
         "location_id": 1,
         "entry_type": "forecast",
         "report_time": datetime.now(),
-        "forecast_time": datetime.now(timezone.utc).isoformat(),
+        "forecast_time": (datetime.now() + timedelta(hours=4)),
         "temperature": 20.5,
         "humidity": 60,
         "wind_speed": 5.0,
