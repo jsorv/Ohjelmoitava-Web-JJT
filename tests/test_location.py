@@ -3,6 +3,7 @@ import pytest
 from API.src.weatherradar import db, create_app
 from API.src.weatherradar.models import Location
 
+
 @pytest.fixture
 def client():
     """Pytest fixture to set up a test client with a clean database."""
@@ -36,7 +37,7 @@ def _populate_db():
         latitude=60.16,
         longitude=24.93,
     )
-    
+
     location3 = Location(
         country="Finland",
         city="Tampere",
@@ -47,19 +48,21 @@ def _populate_db():
     db.session.add_all([location1, location2, location3])
     db.session.commit()
 
+
 def _get_valid_location():
     """Helper function to return a valid location dictionary."""
     return {
         "country": "Sweden",
         "city": "Stockholm",
         "latitude": 59.33,
-        "longitude": 18.06
+        "longitude": 18.06,
     }
+
 
 class TestLocation(object):
     """Test suite for the Location resources."""
 
-    RESOURCE_URL = "/api/locations/"
+    RESOURCE_URL = "/weatherradar/api/locations/"
 
     def test_get(self, client):
         """Test retrieving all locations."""
@@ -103,17 +106,18 @@ class TestLocation(object):
             "country": "Finland",
             "city": "Helsinki",  # already exists as location 2
             "latitude": 60.16,
-            "longitude": 24.93
+            "longitude": 24.93,
         }
 
         resp = client.post(self.RESOURCE_URL, json=valid)
         assert resp.status_code == 409
 
+
 class TestLocationItem(object):
     """Test suite for the LocationItem resources."""
 
-    RESOURCE_URL = "/api/locations/1/"
-    INVALID_URL = "/api/locations/999/"
+    RESOURCE_URL = "/weatherradar/api/locations/1/"
+    INVALID_URL = "/weatherradar/api/locations/999/"
 
     def test_get(self, client):
         """Test retrieving a specific location."""
@@ -156,7 +160,7 @@ class TestLocationItem(object):
             "country": "Finland",
             "city": "Helsinki",  # already exists as location 2
             "latitude": 60.16,
-            "longitude": 24.93
+            "longitude": 24.93,
         }
 
         resp = client.put(self.RESOURCE_URL, json=valid)

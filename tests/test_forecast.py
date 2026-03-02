@@ -93,7 +93,7 @@ def _get_valid_weather_forecast():
 class TestForecast(object):
     """Test suite for the WeatherForecasts and WeatherForecastItem resources."""
 
-    RESOURCE_URL = "/api/locations/1/forecasts/"
+    RESOURCE_URL = "weatherradar/api/locations/1/forecasts/"
 
     def test_get(self, client):
         """Test retrieving all forecasts for a location."""
@@ -161,8 +161,8 @@ class TestForecast(object):
 
 class TestForecastItem(object):
 
-    RESOURCE_URL = "/api/locations/1/forecasts/1/"
-    INVALID_URL = "/api/locations/1/forecasts/999/"
+    RESOURCE_URL = "weatherradar/api/locations/1/forecasts/1/"
+    INVALID_URL = "weatherradar/api/locations/1/forecasts/999/"
 
     def test_get(self, client):
         """Test retrieving a specific forecast for a location."""
@@ -233,7 +233,9 @@ class TestForecastItem(object):
         # Try to update another forecast to the same time (should conflict)
         conflict["forecast_time"] = time
         conflict["report_id"] = 2
-        response = client.put("/api/locations/1/forecasts/2/", json=conflict)
+        response = client.put(
+            "/weatherradar/api/locations/1/forecasts/2/", json=conflict
+        )
         assert response.status_code == 409
 
     def test_delete(self, client):
