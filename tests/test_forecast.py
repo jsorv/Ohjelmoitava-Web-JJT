@@ -146,6 +146,15 @@ class TestForecast(object):
         response = client.post(self.RESOURCE_URL, json=valid)
         assert response.status_code == 400
 
+    def test_post_missing_forecast_time(self, client):
+        """Test creating a new forecast with missing forecast_time."""
+        valid = _get_valid_weather_forecast()
+        # Remove the required forecast_time field
+        valid.pop("forecast_time")
+        # Try to create the forecast without forecast_time (should fail)
+        response = client.post(self.RESOURCE_URL, json=valid)
+        assert response.status_code == 400
+
     def test_post_conflict(self, client):
         """Test creating a new forecast that conflicts with an existing one."""
         # Create a forecast with a known time (should succeed)
@@ -217,6 +226,15 @@ class TestForecastItem(object):
         # Remove a required field to make the JSON invalid
         valid.pop("temperature")
         # Try to update the forecast with invalid JSON (should fail)
+        response = client.put(self.RESOURCE_URL, json=valid)
+        assert response.status_code == 400
+
+    def test_put_missing_forecast_time(self, client):
+        """Test updating a specific forecast with missing forecast_time."""
+        valid = _get_valid_weather_forecast()
+        # Remove the required forecast_time field
+        valid.pop("forecast_time")
+        # Try to update the forecast without forecast_time (should fail)
         response = client.put(self.RESOURCE_URL, json=valid)
         assert response.status_code == 400
 

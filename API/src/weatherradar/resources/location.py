@@ -7,9 +7,10 @@ from werkzeug.exceptions import BadRequest, Conflict, UnsupportedMediaType
 from API.src.weatherradar.models import Location
 from API.src.weatherradar import db
 
+
 class Locations(Resource):
     """Resource for managing locations."""
-    
+
     def get(self):
         """Get all locations.
 
@@ -27,8 +28,10 @@ class Locations(Resource):
         The request body must be a JSON object containing the location data.
         Returns a 201 Created response with a Location header pointing to the new location.
         """
-        if not request.json:
-            raise UnsupportedMediaType(description="Request body must be JSON")
+        if request.content_type != "application/json":
+            raise UnsupportedMediaType(
+                description="Content-Type must be application/json"
+            )
         try:
             validate(request.json, Location.json_schema())
         except ValidationError as e:
@@ -51,7 +54,7 @@ class Locations(Resource):
 
         return Response(
             status=201,
-            headers={"Location": url_for("api.locationitem", location=location)}
+            headers={"Location": url_for("api.locationitem", location=location)},
         )
 
 
@@ -72,8 +75,10 @@ class LocationItem(Resource):
         The request body must be a JSON object containing the updated location data.
         Returns a 204 No Content response if the update is successful.
         """
-        if not request.json:
-            raise UnsupportedMediaType(description="Request body must be JSON")
+        if request.content_type != "application/json":
+            raise UnsupportedMediaType(
+                description="Content-Type must be application/json"
+            )
         try:
             validate(request.json, Location.json_schema())
         except ValidationError as e:

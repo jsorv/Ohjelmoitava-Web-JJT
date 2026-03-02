@@ -35,21 +35,24 @@ class WeatherForecasts(Resource):
             The request body must be a JSON object containing the forecast data.
             Returns a 201 Created response with a Location header pointing to the new forecast.
         """
-        if not request.json:
-            raise UnsupportedMediaType(description="Request body must be JSON")
+        if request.content_type != "application/json":
+            raise UnsupportedMediaType(
+                description="Content-Type must be application/json"
+            )
 
         try:
             validate(instance=request.json, schema=WeatherReport.json_schema())
         except ValidationError as e:
             raise BadRequest(description=str(e)) from e
 
+        if request.json.get("forecast_time") is None:
+            raise BadRequest(description="Missing required field: forecast_time")
+
         forecast = WeatherReport()
         forecast.deserialize(request.json, location.location_id, entry_type="forecast")
         try:
             db.session.add(forecast)
             db.session.commit()
-        except KeyError as e:
-            raise BadRequest(description=str(e)) from e
         except IntegrityError:
             raise Conflict(description="A forecast for this time already exists.")
 
@@ -83,8 +86,10 @@ class WeatherForecastItem(Resource):
             Forecast time is required for updates.
             Returns a 204 No Content response if the update is successful.
         """
-        if not request.json:
-            raise UnsupportedMediaType(description="Request body must be JSON")
+        if request.content_type != "application/json":
+            raise UnsupportedMediaType(
+                description="Content-Type must be application/json"
+            )
         try:
             validate(request.json, WeatherReport.json_schema())
         except ValidationError as e:
