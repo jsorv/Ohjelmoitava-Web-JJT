@@ -7,7 +7,7 @@ from .resources.report import WeatherReports, WeatherReportItem
 
 # from . import views
 
-api_bp = Blueprint("api", __name__, url_prefix="/api")
+api_bp = Blueprint("api", __name__, url_prefix="/weatherradar/api")
 
 
 api = Api(api_bp)
@@ -23,9 +23,9 @@ api.add_resource(
 )
 
 # TEMP REMOVING THIS TO MAKE PYTEST PASS
-'''
+"""
 api.add_resource(WeatherReports, "/locations/<location:location>/reports/")
 api.add_resource(
     WeatherReportItem, "/locations/<location:location>/reports/<report:report>/"
 )
-'''
+"""

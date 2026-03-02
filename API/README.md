@@ -12,26 +12,24 @@ This is an information storage API for weather station data
 
 **Setup framework**
 
-????
+1. ```git clone https://github.com/jsorv/Ohjelmoitava-Web-JJT.git```
+2. ``` cd Ohjelmoitava-Web-JJT ```
+3. *Create and activate virtual environment*
+4. ``` pip install -e API/src ```
 
 **Init and populate database**
 
-(Make sure you have all dependencies)
-From repo root run this command:
+From repo root:
 
 ``` python -m API.src.scripts.populate_db ```
 
-This initializes a few locations and reports to the database.
-
 **How to run this API**
 
-From repo root run this command:
+From repo root:
 
 ``` flask --app=API.src.weatherradar --debug run ```
 
 **URL to access this API**
 
-The URL to access your API (usually nameofapplication/api/version/)=> the path to your application. We mean the entry point, the main endpoint of your API.
-
-Ei kai meillä tämmöstä ole???
+weatherradar/api/
 
