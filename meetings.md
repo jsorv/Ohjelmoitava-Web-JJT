@@ -34,12 +34,19 @@ Note that our API is a data storage.
 
 
 ## Meeting 3.
-* **DATE:**
-* **PARTICIPANTS:**
-* **TEACHER:**
+* **DATE:04.03.2026**
+* **PARTICIPANTS: Jaakko Jenna Teemu**
+* **TEACHER: Mika Oja**
 
 ### Action points
-*List here the actions points discussed with assistants*
+
+- URL endpointit pitäis loppua "/" merkkiin
+- Database model id:tä ei kuulu käyttää apissa (joku muu identifier)
+- src kansio ylimääräinen apin sisällä
+- tests kansio API:n sisään
+- Database kansio on turha
+- Korjaa pylint 
+- Korjaa forecastin json schema
 
 ### Notes
 *Add here notes that you consider important. This is not mandatory*
