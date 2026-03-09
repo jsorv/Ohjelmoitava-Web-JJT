@@ -1,12 +1,13 @@
+"""Resource for managing weather forecasts for specific locations."""
+
+import json
 from flask import request, Response, url_for
 from flask_restful import Resource
 from sqlalchemy.exc import IntegrityError
-from werkzeug.exceptions import BadRequest, UnsupportedMediaType, NotFound, Conflict
+from werkzeug.exceptions import BadRequest, UnsupportedMediaType, Conflict
 from jsonschema import validate, ValidationError
-import json
 
-from API.weatherradar.models import WeatherReport
-from API.weatherradar import db
+from api.weatherradar import db
 
 
 class WeatherForecasts(Resource):
@@ -19,6 +20,8 @@ class WeatherForecasts(Resource):
             location (Location): The location for which to retrieve forecasts.
             Returns a list of forecasts for the specified location.
         """
+        from api.weatherradar.models import WeatherReport
+
         forecasts = WeatherReport.query.filter_by(
             location_id=location.location_id, entry_type="forecast"
         ).all()
@@ -35,6 +38,8 @@ class WeatherForecasts(Resource):
             The request body must be a JSON object containing the forecast data.
             Returns a 201 Created response with a Location header pointing to the new forecast.
         """
+        from api.weatherradar.models import WeatherReport
+
         if request.content_type != "application/json":
             raise UnsupportedMediaType(
                 description="Content-Type must be application/json"
@@ -53,8 +58,10 @@ class WeatherForecasts(Resource):
         try:
             db.session.add(forecast)
             db.session.commit()
-        except IntegrityError:
-            raise Conflict(description="A forecast for this time already exists.")
+        except IntegrityError as exc:
+            raise Conflict(
+                description="A forecast for this time already exists."
+            ) from exc
 
         return Response(
             status=201,
@@ -86,6 +93,8 @@ class WeatherForecastItem(Resource):
             Forecast time is required for updates.
             Returns a 204 No Content response if the update is successful.
         """
+        from api.weatherradar.models import WeatherReport
+
         if request.content_type != "application/json":
             raise UnsupportedMediaType(
                 description="Content-Type must be application/json"
@@ -103,12 +112,11 @@ class WeatherForecastItem(Resource):
         try:
             db.session.add(forecast)
             db.session.commit()
-        except IntegrityError:
+        except IntegrityError as exc:
+            db.session.rollback()
             raise Conflict(
-                description="A forecast for this '{forecast_time}, {location_id}' already exists.".format(
-                    **request.json
-                )
-            )
+                description=f"A forecast for this '{request.json.get('forecast_time')}, {location.location_id}' already exists."
+            ) from exc
         return Response(
             status=204,
             headers={

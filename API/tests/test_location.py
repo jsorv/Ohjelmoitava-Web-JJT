@@ -1,11 +1,11 @@
 import json
 import pytest
-from API.weatherradar import db, create_app
-from API.weatherradar.models import Location
+from api.weatherradar import db, create_app
+from api.weatherradar.models import Location
 
 
 @pytest.fixture
-def client():
+def client_fixture():
     """Pytest fixture to set up a test client with a clean database."""
     test_config = {
         "TESTING": True,
@@ -69,9 +69,9 @@ class TestLocation(object):
 
     RESOURCE_URL = "/weatherradar/api/locations/"
 
-    def test_get(self, client):
+    def test_get(self, client_fixture):
         """Test retrieving all locations."""
-        resp = client.get(self.RESOURCE_URL)
+        resp = client_fixture.get(self.RESOURCE_URL)
         assert resp.status_code == 200
         body = json.loads(resp.data)
         assert len(body) == 3
@@ -81,31 +81,31 @@ class TestLocation(object):
             assert "latitude" in item
             assert "longitude" in item
 
-    def test_post_valid(self, client):
+    def test_post_valid(self, client_fixture):
         """Test creating a new location with valid data."""
         valid = _get_valid_location()
-        resp = client.post(self.RESOURCE_URL, json=valid)
+        resp = client_fixture.post(self.RESOURCE_URL, json=valid)
         assert resp.status_code == 201
         assert "Location" in resp.headers
 
         # Verify resource exists
-        resp = client.get(resp.headers["Location"])
+        resp = client_fixture.get(resp.headers["Location"])
         assert resp.status_code == 200
 
-    def test_post_invalid_media_type(self, client):
+    def test_post_invalid_media_type(self, client_fixture):
         """Test creating a new location with an invalid media type."""
         valid = _get_valid_location()
-        resp = client.post(self.RESOURCE_URL, data=json.dumps(valid))
+        resp = client_fixture.post(self.RESOURCE_URL, data=json.dumps(valid))
         assert resp.status_code == 415
 
-    def test_post_invalid_json(self, client):
+    def test_post_invalid_json(self, client_fixture):
         """Test creating a new location with invalid JSON data."""
         valid = _get_valid_location()
         valid.pop("country")
-        resp = client.post(self.RESOURCE_URL, json=valid)
+        resp = client_fixture.post(self.RESOURCE_URL, json=valid)
         assert resp.status_code == 400
 
-    def test_post_conflict(self, client):
+    def test_post_conflict(self, client_fixture):
         """Test creating a new location that conflicts with an existing one."""
         valid = {
             "country": "Finland",
@@ -114,7 +114,7 @@ class TestLocation(object):
             "longitude": 24.93,
         }
 
-        resp = client.post(self.RESOURCE_URL, json=valid)
+        resp = client_fixture.post(self.RESOURCE_URL, json=valid)
         assert resp.status_code == 409
 
 
@@ -124,10 +124,10 @@ class TestLocationItem(object):
     RESOURCE_URL = "/weatherradar/api/locations/1/"
     INVALID_URL = "/weatherradar/api/locations/999/"
 
-    def test_get(self, client):
+    def test_get(self, client_fixture):
         """Test retrieving a specific location."""
         # Valid request
-        resp = client.get(self.RESOURCE_URL)
+        resp = client_fixture.get(self.RESOURCE_URL)
         assert resp.status_code == 200
 
         body = json.loads(resp.data)
@@ -137,29 +137,29 @@ class TestLocationItem(object):
         assert "longitude" in body
 
         # Invalid URL
-        resp = client.get(self.INVALID_URL)
+        resp = client_fixture.get(self.INVALID_URL)
         assert resp.status_code == 404
 
-    def test_put_valid(self, client):
+    def test_put_valid(self, client_fixture):
         """Test updating a specific location with valid data."""
         valid = _get_valid_location()
-        resp = client.put(self.RESOURCE_URL, json=valid)
+        resp = client_fixture.put(self.RESOURCE_URL, json=valid)
         assert resp.status_code == 204
 
-    def test_put_invalid_media_type(self, client):
+    def test_put_invalid_media_type(self, client_fixture):
         """Test updating a specific location with an invalid media type."""
         valid = _get_valid_location()
-        resp = client.put(self.RESOURCE_URL, data=json.dumps(valid))
+        resp = client_fixture.put(self.RESOURCE_URL, data=json.dumps(valid))
         assert resp.status_code == 415
 
-    def test_put_invalid_json(self, client):
+    def test_put_invalid_json(self, client_fixture):
         """Test updating a specific location with invalid JSON data."""
         valid = _get_valid_location()
         valid.pop("country")
-        resp = client.put(self.RESOURCE_URL, json=valid)
+        resp = client_fixture.put(self.RESOURCE_URL, json=valid)
         assert resp.status_code == 400
 
-    def test_put_conflict(self, client):
+    def test_put_conflict(self, client_fixture):
         """Test updating a specific location so it conflicts with another location."""
         valid = {
             "country": "Finland",
@@ -168,13 +168,13 @@ class TestLocationItem(object):
             "longitude": 24.93,
         }
 
-        resp = client.put(self.RESOURCE_URL, json=valid)
+        resp = client_fixture.put(self.RESOURCE_URL, json=valid)
         assert resp.status_code == 409
 
-    def test_delete(self, client):
+    def test_delete(self, client_fixture):
         """Test deleting a specific location."""
-        resp = client.delete(self.RESOURCE_URL)
+        resp = client_fixture.delete(self.RESOURCE_URL)
         assert resp.status_code == 204
 
-        resp = client.get(self.RESOURCE_URL)
+        resp = client_fixture.get(self.RESOURCE_URL)
         assert resp.status_code == 404

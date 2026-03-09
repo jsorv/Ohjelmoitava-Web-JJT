@@ -1,12 +1,12 @@
 import json
-import pytest
 from datetime import datetime, timedelta
-from API.weatherradar import db, create_app
-from API.weatherradar.models import WeatherReport, Location
+import pytest
+from api.weatherradar import db, create_app
+from api.weatherradar.models import WeatherReport, Location
 
 
 @pytest.fixture
-def client():
+def client_fixture():
     """Pytest fixture to set up a test client with a clean database."""
     test_config = {
         "TESTING": True,
@@ -95,15 +95,15 @@ def _get_valid_weather_forecast():
     }
 
 
-class TestForecast(object):
+class TestForecast:
     """Test suite for the WeatherForecasts and WeatherForecastItem resources."""
 
     RESOURCE_URL = "/weatherradar/api/locations/1/forecasts/"
 
-    def test_get(self, client):
+    def test_get(self, client_fixture):
         """Test retrieving all forecasts for a location."""
         # Valid request should return a list of forecasts for the location
-        response = client.get(self.RESOURCE_URL)
+        response = client_fixture.get(self.RESOURCE_URL)
         assert response.status_code == 200
         data = json.loads(response.data)
         # Verify the response contains a list of forecasts with the expected fields
@@ -120,68 +120,68 @@ class TestForecast(object):
             assert "rain" in item
             assert "fog" in item
 
-    def test_post_valid(self, client):
+    def test_post_valid(self, client_fixture):
         """Test creating a new forecast with valid data."""
         # Create a new forecast with valid data (should succeed)
         valid = _get_valid_weather_forecast()
-        response = client.post(self.RESOURCE_URL, json=valid)
+        response = client_fixture.post(self.RESOURCE_URL, json=valid)
         assert response.status_code == 201
         assert "Location" in response.headers
 
         # Verify resource exists
-        resp = client.get(response.headers["Location"])
+        resp = client_fixture.get(response.headers["Location"])
         assert resp.status_code == 200
 
-    def test_post_invalid_media_type(self, client):
+    def test_post_invalid_media_type(self, client_fixture):
         """Test creating a new forecast with an invalid media type."""
         # Convert datetime objects to ISO format strings for JSON serialization
         valid = _get_valid_weather_forecast()
         valid["report_time"] = valid["report_time"].isoformat()
         valid["forecast_time"] = valid["forecast_time"].isoformat()
         # Try to create the forecast with invalid media type (should fail)
-        response = client.post(self.RESOURCE_URL, data=json.dumps(valid))
+        response = client_fixture.post(self.RESOURCE_URL, data=json.dumps(valid))
         assert response.status_code == 415
 
-    def test_post_invalid_json(self, client):
+    def test_post_invalid_json(self, client_fixture):
         """Test creating a new forecast with invalid JSON data."""
         # Remove a required field to make the JSON invalid
         valid = _get_valid_weather_forecast()
         valid.pop("temperature")
         # Try to create the forecast with invalid JSON (should fail)
-        response = client.post(self.RESOURCE_URL, json=valid)
+        response = client_fixture.post(self.RESOURCE_URL, json=valid)
         assert response.status_code == 400
 
-    def test_post_missing_forecast_time(self, client):
+    def test_post_missing_forecast_time(self, client_fixture):
         """Test creating a new forecast with missing forecast_time."""
         valid = _get_valid_weather_forecast()
         # Remove the required forecast_time field
         valid.pop("forecast_time")
         # Try to create the forecast without forecast_time (should fail)
-        response = client.post(self.RESOURCE_URL, json=valid)
+        response = client_fixture.post(self.RESOURCE_URL, json=valid)
         assert response.status_code == 400
 
-    def test_post_conflict(self, client):
+    def test_post_conflict(self, client_fixture):
         """Test creating a new forecast that conflicts with an existing one."""
         # Create a forecast with a known time (should succeed)
         valid = _get_valid_weather_forecast()
         valid["forecast_time"] = datetime.now() + timedelta(hours=1)
-        response = client.post(self.RESOURCE_URL, json=valid)
+        response = client_fixture.post(self.RESOURCE_URL, json=valid)
         assert response.status_code == 201
 
         # Try to post the same forecast again (should conflict)
-        response = client.post(self.RESOURCE_URL, json=valid)
+        response = client_fixture.post(self.RESOURCE_URL, json=valid)
         assert response.status_code == 409
 
 
-class TestForecastItem(object):
+class TestForecastItem:
 
     RESOURCE_URL = "/weatherradar/api/locations/1/forecasts/1/"
     INVALID_URL = "/weatherradar/api/locations/1/forecasts/999/"
 
-    def test_get(self, client):
+    def test_get(self, client_fixture):
         """Test retrieving a specific forecast for a location."""
         # Valid request should return the forecast
-        response = client.get(self.RESOURCE_URL)
+        response = client_fixture.get(self.RESOURCE_URL)
         assert response.status_code == 200
 
         # Verify the response contains the expected forecast data
@@ -197,15 +197,15 @@ class TestForecastItem(object):
         assert "rain" in body
         assert "fog" in body
 
-    def test_put_valid(self, client):
+    def test_put_valid(self, client_fixture):
         """Test updating a specific forecast with valid data."""
         # Update the forecast with valid data
         valid = _get_valid_weather_forecast()
-        response = client.put(self.RESOURCE_URL, json=valid)
+        response = client_fixture.put(self.RESOURCE_URL, json=valid)
         assert response.status_code == 204
 
         # Verify resource was updated
-        response = client.get(self.RESOURCE_URL)
+        response = client_fixture.get(self.RESOURCE_URL)
         assert response.status_code == 200
         body = json.loads(response.data)
         assert body["temperature"] == valid["temperature"]
@@ -215,58 +215,58 @@ class TestForecastItem(object):
         assert body["rain"] == valid["rain"]
         assert body["fog"] == valid["fog"]
 
-    def test_put_invalid_media_type(self, client):
+    def test_put_invalid_media_type(self, client_fixture):
         """Test updating a specific forecast with an invalid media type."""
         valid = _get_valid_weather_forecast()
         # Convert datetime objects to ISO format strings for JSON serialization
         valid["report_time"] = valid["report_time"].isoformat()
         valid["forecast_time"] = valid["forecast_time"].isoformat()
         # Try to update the forecast with invalid media type (should fail)
-        response = client.put(self.RESOURCE_URL, data=json.dumps(valid))
+        response = client_fixture.put(self.RESOURCE_URL, data=json.dumps(valid))
         assert response.status_code == 415
 
-    def test_put_invalid_json(self, client):
+    def test_put_invalid_json(self, client_fixture):
         """Test updating a specific forecast with invalid JSON data."""
         valid = _get_valid_weather_forecast()
         # Remove a required field to make the JSON invalid
         valid.pop("temperature")
         # Try to update the forecast with invalid JSON (should fail)
-        response = client.put(self.RESOURCE_URL, json=valid)
+        response = client_fixture.put(self.RESOURCE_URL, json=valid)
         assert response.status_code == 400
 
-    def test_put_missing_forecast_time(self, client):
+    def test_put_missing_forecast_time(self, client_fixture):
         """Test updating a specific forecast with missing forecast_time."""
         valid = _get_valid_weather_forecast()
         # Remove the required forecast_time field
         valid.pop("forecast_time")
         # Try to update the forecast without forecast_time (should fail)
-        response = client.put(self.RESOURCE_URL, json=valid)
+        response = client_fixture.put(self.RESOURCE_URL, json=valid)
         assert response.status_code == 400
 
-    def test_put_conflict(self, client):
+    def test_put_conflict(self, client_fixture):
         """Test updating a specific forecast to a time that conflicts with another forecast."""
         valid = _get_valid_weather_forecast()
         conflict = _get_valid_weather_forecast()
         time = datetime.now() + timedelta(hours=2)
         valid["forecast_time"] = time
         # Update the forecast to a known time (should succeed)
-        response = client.put(self.RESOURCE_URL, json=valid)
+        response = client_fixture.put(self.RESOURCE_URL, json=valid)
         assert response.status_code == 204
 
         # Try to update another forecast to the same time (should conflict)
         conflict["forecast_time"] = time
         conflict["report_id"] = 2
-        response = client.put(
+        response = client_fixture.put(
             "/weatherradar/api/locations/1/forecasts/2/", json=conflict
         )
         assert response.status_code == 409
 
-    def test_delete(self, client):
+    def test_delete(self, client_fixture):
         """Test deleting a specific forecast for a location."""
         # Delete the forecast
-        response = client.delete(self.RESOURCE_URL)
+        response = client_fixture.delete(self.RESOURCE_URL)
         assert response.status_code == 204
 
         # Verify resource was deleted
-        response = client.get(self.RESOURCE_URL)
+        response = client_fixture.get(self.RESOURCE_URL)
         assert response.status_code == 404

@@ -1,11 +1,12 @@
+"""Resource for managing locations."""
+
 from flask import Response, request, url_for
 from flask_restful import Resource
 from jsonschema import ValidationError, validate
 from sqlalchemy.exc import IntegrityError
 from werkzeug.exceptions import BadRequest, Conflict, UnsupportedMediaType
 
-from API.weatherradar.models import Location
-from API.weatherradar import db
+from api.weatherradar import db
 
 
 class Locations(Resource):
@@ -16,6 +17,8 @@ class Locations(Resource):
 
         Returns a list of forecasts for the specified location.
         """
+        from api.weatherradar.models import Location
+
         response_data = []
         locations = Location.query.all()
         for location in locations:
@@ -28,6 +31,8 @@ class Locations(Resource):
         The request body must be a JSON object containing the location data.
         Returns a 201 Created response with a Location header pointing to the new location.
         """
+        from api.weatherradar.models import Location
+
         if request.content_type != "application/json":
             raise UnsupportedMediaType(
                 description="Content-Type must be application/json"
@@ -35,7 +40,7 @@ class Locations(Resource):
         try:
             validate(request.json, Location.json_schema())
         except ValidationError as e:
-            raise BadRequest(description=str(e))
+            raise BadRequest(description=str(e)) from e
 
         location = Location()
         location.deserialize(request.json)
@@ -44,13 +49,11 @@ class Locations(Resource):
             db.session.add(location)
             db.session.commit()
         except KeyError as e:
-            raise BadRequest(description=str(e))
-        except IntegrityError:
+            raise BadRequest(description=str(e)) from e
+        except IntegrityError as exc:
             raise Conflict(
-                description="Location with name '{city}, {country}' already exists.".format(
-                    **request.json
-                )
-            )
+                description=f"Location with name '{request.json.get('city')}, {request.json.get('country')}' already exists."
+            ) from exc
 
         return Response(
             status=201,
@@ -75,6 +78,8 @@ class LocationItem(Resource):
         The request body must be a JSON object containing the updated location data.
         Returns a 204 No Content response if the update is successful.
         """
+        from api.weatherradar.models import Location
+
         if request.content_type != "application/json":
             raise UnsupportedMediaType(
                 description="Content-Type must be application/json"
@@ -82,18 +87,16 @@ class LocationItem(Resource):
         try:
             validate(request.json, Location.json_schema())
         except ValidationError as e:
-            raise BadRequest(description=str(e))
+            raise BadRequest(description=str(e)) from e
 
         location.deserialize(request.json)
         try:
             db.session.add(location)
             db.session.commit()
-        except IntegrityError:
+        except IntegrityError as exc:
             raise Conflict(
-                description="Location with name '{city}, {country}' already exists.".format(
-                    **request.json
-                )
-            )
+                description=f"Location with name '{request.json.get('city')}, {request.json.get('country')}' already exists."
+            ) from exc
 
         return Response(status=204)
 

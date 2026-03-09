@@ -1,3 +1,5 @@
+"""Script to populate the database with sample data for testing."""
+
 from datetime import datetime, timedelta
 from ..weatherradar import db, create_app
 

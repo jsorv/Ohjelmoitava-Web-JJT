@@ -1,16 +1,20 @@
+"""Resource for managing weather reports."""
+
 from flask import Response, request, url_for
 from flask_restful import Resource
 from sqlalchemy.exc import IntegrityError
 from jsonschema import validate
 from jsonschema.exceptions import ValidationError
 
-from API.weatherradar.models import WeatherReport
-from API.weatherradar import db
+from api.weatherradar.models import WeatherReport
+from api.weatherradar import db
 
 
 class WeatherReports(Resource):
+    """Resource for managing weather reports for a specific location."""
 
     def get(self, location):
+        """Get all weather reports for a location."""
         reports = WeatherReport.query.filter_by(
             location_id=location.location_id, entry_type="report"
         ).all()
@@ -20,6 +24,7 @@ class WeatherReports(Resource):
         return response_data
 
     def post(self, location):
+        """Create a new weather report for a location."""
         if not request.json:
             return {"error": "Invalid JSON"}, 415
         try:
@@ -27,12 +32,12 @@ class WeatherReports(Resource):
         except ValidationError as e:
             return {"error": f"Missing field: {str(e)}"}, 400
 
-        weatherReport = WeatherReport()
-        weatherReport.deserialize(
+        weather_report = WeatherReport()
+        weather_report.deserialize(
             request.json, location_id=location.location_id, entry_type="report"
         )
         try:
-            db.session.add(weatherReport)
+            db.session.add(weather_report)
             db.session.commit()
         except IntegrityError:
             return {
@@ -43,18 +48,21 @@ class WeatherReports(Resource):
             status=201,
             headers={
                 "Location": url_for(
-                    "api.weatherreportitem", location=location, report=weatherReport
+                    "api.weatherreportitem", location=location, report=weather_report
                 )
             },
         )
 
 
 class WeatherReportItem(Resource):
+    """Resource for managing a specific weather report."""
 
     def get(self, location, report):
+        """Get a specific weather report."""
         return report.serialize()
 
     def put(self, location, report):
+        """Update a specific weather report."""
         if not request.json:
             return {"error": "Invalid JSON"}, 415
         try:
@@ -74,6 +82,7 @@ class WeatherReportItem(Resource):
         return {"message": "Weather report updated successfully."}, 200
 
     def delete(self, location, report):
+        """Delete a specific weather report."""
         db.session.delete(report)
         db.session.commit()
 

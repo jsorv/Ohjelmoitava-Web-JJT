@@ -1,8 +1,7 @@
+"""Utility functions and classes for the Weather Radar API."""
+
 from werkzeug.exceptions import NotFound
 from werkzeug.routing import BaseConverter
-
-from .models import Location
-from .models import WeatherReport
 
 
 class LocationConverter(BaseConverter):
@@ -10,10 +9,12 @@ class LocationConverter(BaseConverter):
 
     def to_python(self, value):
         """Fetches a Location object by its location_id."""
+        from .models import Location
+
         try:
             location_id = int(value)
-        except ValueError:
-            raise NotFound(description="Invalid location ID format")
+        except ValueError as exc:
+            raise NotFound(description="Invalid location ID format") from exc
 
         location = Location.query.filter_by(location_id=location_id).first()
         if not location:
@@ -30,10 +31,12 @@ class ForecastConverter(BaseConverter):
 
     def to_python(self, value):
         """Fetches a WeatherReport forecast by its report_id."""
+        from .models import WeatherReport
+
         try:
             report_id = int(value)
-        except ValueError:
-            raise NotFound(description="Invalid forecast ID format")
+        except ValueError as exc:
+            raise NotFound(description="Invalid forecast ID format") from exc
 
         forecast = WeatherReport.query.filter_by(
             report_id=report_id, entry_type="forecast"
@@ -45,16 +48,19 @@ class ForecastConverter(BaseConverter):
     def to_url(self, value):
         """Converts a WeatherReport object back to a URL component."""
         return str(value.report_id)
-    
+
+
 class ReportConverter(BaseConverter):
     """Custom URL converter to fetch WeatherReport reports by ID."""
 
     def to_python(self, value):
         """Fetches a WeatherReport report by its report_id."""
+        from .models import WeatherReport
+
         try:
             report_id = int(value)
-        except ValueError:
-            raise NotFound(description="Invalid report ID format")
+        except ValueError as exc:
+            raise NotFound(description="Invalid report ID format") from exc
 
         report = WeatherReport.query.filter_by(
             report_id=report_id, entry_type="report"

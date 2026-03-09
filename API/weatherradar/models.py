@@ -1,12 +1,16 @@
+"""Models for the Weather Radar application."""
+
 import datetime
+from datetime import datetime
 from email.utils import parsedate_to_datetime
 from sqlalchemy import text
-from datetime import datetime
 
 from . import db
 
+
 # from AI def parse_datetime(value):
 def parse_datetime(value):
+    """Parses a datetime string in ISO 8601 format or RFC 2822 format."""
     if value is None:
         return None
     try:
@@ -92,15 +96,17 @@ class WeatherReport(db.Model):
     __table_args__ = (
         db.Index(
             "uq_report_loc_report_time",
-            "location_id", "report_time",
+            "location_id",
+            "report_time",
             unique=True,
-            sqlite_where=text("entry_type = 'report'")
+            sqlite_where=text("entry_type = 'report'"),
         ),
         db.Index(
             "uq_forecast_loc_forecast_time",
-            "location_id", "forecast_time",
+            "location_id",
+            "forecast_time",
             unique=True,
-            sqlite_where=text("entry_type = 'forecast'")
+            sqlite_where=text("entry_type = 'forecast'"),
         ),
     )
 
@@ -132,12 +138,15 @@ class WeatherReport(db.Model):
         return f"<WeatherReport {self.entry_type} for {self.location.id} at {self.report_time}>"
 
     def serialize(self):
+        """Serializes the WeatherReport object to a dictionary."""
         return {
             "report_id": self.report_id,
             "location_id": self.location_id,
             "entry_type": self.entry_type,
             "report_time": self.report_time.isoformat() if self.report_time else None,
-            "forecast_time": self.forecast_time.isoformat() if self.forecast_time else None,
+            "forecast_time": (
+                self.forecast_time.isoformat() if self.forecast_time else None
+            ),
             "temperature": self.temperature,
             "humidity": self.humidity,
             "wind_speed": self.wind_speed,
@@ -145,8 +154,9 @@ class WeatherReport(db.Model):
             "rain": self.rain,
             "fog": self.fog,
         }
-        
+
     def deserialize(self, data, location_id, entry_type="report"):
+        """Deserializes a dictionary to populate the WeatherReport object."""
         self.location_id = location_id
         self.entry_type = entry_type
 
@@ -212,5 +222,3 @@ class WeatherReport(db.Model):
         props["rain"] = {"description": "Whether it is raining", "type": "boolean"}
         props["fog"] = {"description": "Whether it is foggy", "type": "boolean"}
         return schema
-    
-    
