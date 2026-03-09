@@ -1,7 +1,0 @@
-flask
-flask-restful
-flask-sqlalchemy
-jsonschema
-SQLAlchemy
-pytest
-pytest-cov

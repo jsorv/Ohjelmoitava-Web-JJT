@@ -10,6 +10,8 @@ This is an information storage API for weather station data
     - jsonschema
     - SQLAlchemy
     - python-dateutil
+    - pytest
+    - pytest-cov
 
 **Setup framework**
 

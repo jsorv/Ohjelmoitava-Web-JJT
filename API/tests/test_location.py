@@ -1,13 +1,18 @@
 import json
 import pytest
-from API.src.weatherradar import db, create_app
-from API.src.weatherradar.models import Location
+from API.weatherradar import db, create_app
+from API.weatherradar.models import Location
 
 
 @pytest.fixture
 def client():
     """Pytest fixture to set up a test client with a clean database."""
-    app = create_app()
+    test_config = {
+        "TESTING": True,
+        "SQLALCHEMY_DATABASE_URI": "sqlite:///:memory:",
+        "SQLALCHEMY_TRACK_MODIFICATIONS": False,
+    }
+    app = create_app(test_config)
     ctx = app.app_context()
     ctx.push()
 

@@ -17,6 +17,8 @@ dependencies = [
     "flask-sqlalchemy",
     "jsonschema",
     "SQLAlchemy",
+    "pytest",
+    "pytest-cov",
 ]
 
 [tool.setuptools.packages.find]

@@ -2,14 +2,19 @@ import json
 from urllib import response
 import pytest
 from datetime import datetime, timedelta, timezone
-from API.src.weatherradar import db, create_app
-from API.src.weatherradar.models import WeatherReport, Location
+from API.weatherradar import db, create_app
+from API.weatherradar.models import WeatherReport, Location
 
 
 @pytest.fixture
 def client():
     """Pytest fixture to set up a test client with a clean database."""
-    app = create_app()
+    test_config = {
+        "TESTING": True,
+        "SQLALCHEMY_DATABASE_URI": "sqlite:///:memory:",
+        "SQLALCHEMY_TRACK_MODIFICATIONS": False,
+    }
+    app = create_app(test_config)
     ctx = app.app_context()
     ctx.push()
 
@@ -115,21 +120,25 @@ class TestReport(object):
         resp = client.post(self.RESOURCE_URL, json=valid)
         assert resp.status_code == 201
         assert "Location" in resp.headers
-        
+
         resp = client.get(resp.headers["Location"])
         assert resp.status_code == 200
 
     def test_post_invalid_media_type(self, client):
         """Test creating a new weather report with an invalid media type."""
         valid = _get_valid_weather_report()
-        resp = client.post(self.RESOURCE_URL, data=json.dumps(valid), content_type="text/plain")
+        resp = client.post(
+            self.RESOURCE_URL, data=json.dumps(valid), content_type="text/plain"
+        )
         assert resp.status_code == 415
 
     def test_post_invalid_json(self, client):
         """Test creating a new weather report with invalid JSON."""
         valid = _get_valid_weather_report()
         valid.pop("temperature")
-        resp = client.post(self.RESOURCE_URL, data="not a json", content_type="application/json")
+        resp = client.post(
+            self.RESOURCE_URL, data="not a json", content_type="application/json"
+        )
         assert resp.status_code == 400
 
     def test_post_conflict(self, client):
@@ -161,7 +170,7 @@ class TestReportItem(object):
         assert "report_id" in body
         assert "report_time" in body
 
-        #invalid URL
+        # invalid URL
         resp = client.get(self.INVALID_URL)
         assert resp.status_code == 404
 
@@ -180,26 +189,34 @@ class TestReportItem(object):
     def test_put_invalid_media_type(self, client):
         """Test updating an existing weather report with an invalid media type."""
         valid = _get_valid_weather_report()
-        resp = client.put(self.RESOURCE_URL, data=json.dumps(valid), content_type="text/plain")
+        resp = client.put(
+            self.RESOURCE_URL, data=json.dumps(valid), content_type="text/plain"
+        )
         assert resp.status_code == 415
 
     def test_put_invalid_json(self, client):
         """Test updating an existing weather report with invalid JSON."""
-        resp = client.put(self.RESOURCE_URL, data="not a json", content_type="application/json")
+        resp = client.put(
+            self.RESOURCE_URL, data="not a json", content_type="application/json"
+        )
         assert resp.status_code == 400
 
     def test_put_conflict(self, client):
         """Test updating an existing weather report to a state that conflicts with another report."""
-        reports = WeatherReport.query.filter_by(location_id=1, entry_type="report").all()
+        reports = WeatherReport.query.filter_by(
+            location_id=1, entry_type="report"
+        ).all()
         assert len(reports) >= 2
 
         target = reports[0]
         other = reports[1]
 
         item_url = f"{self.BASE_URL}{target.report_id}/"
-        
+
         valid = _get_valid_weather_report()
-        valid["report_time"] = other.report_time.isoformat()  # same as another existing report
+        valid["report_time"] = (
+            other.report_time.isoformat()
+        )  # same as another existing report
         resp = client.put(item_url, json=valid)
         assert resp.status_code == 409
 
