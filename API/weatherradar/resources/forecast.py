@@ -5,8 +5,8 @@ from werkzeug.exceptions import BadRequest, UnsupportedMediaType, NotFound, Conf
 from jsonschema import validate, ValidationError
 import json
 
-from API.src.weatherradar.models import WeatherReport
-from API.src.weatherradar import db
+from API.weatherradar.models import WeatherReport
+from API.weatherradar import db
 
 
 class WeatherForecasts(Resource):
