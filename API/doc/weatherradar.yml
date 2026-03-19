@@ -1,0 +1,393 @@
+---
+openapi: 3.0.4
+servers:
+- url: /weatherradar/api
+
+components:
+  parameters:
+    location:
+      description: Name of geographical location
+      in: path
+      name: location
+      required: true
+      schema:
+        type: string
+    forecast:
+      description: Weather forecast report
+      in: path
+      name: forecast
+      required: true
+      schema:
+        type: integer
+    report:
+      description: Weather report
+      in: path
+      name: report
+      required: true
+      schema:
+        type: integer
+
+  schemas:
+    Location:
+      type: object
+      properties:
+        country:
+          description: Country name
+          type: string
+        city:
+          description: City name
+          type: string
+        latitude:
+          description: Geographic latitude
+          type: number
+        longitude:
+          description: Geographic longitude
+          type: number
+      required:
+      - country
+      - city
+      - latitude
+      - longitude
+    Report:
+      type: object
+      properties:
+        report_time:
+          description: The time the report was made
+          type: string
+          format: date-time
+        forecast_time:
+          description: The time the forecast is for (only for forecasts)
+          type: string
+          format: date-time
+        temperature:
+          description: Temperature in Celsius
+          type: number
+        humidity:
+          description: Humidity percentage
+          type: integer
+        wind_speed:
+          description: Wind speed in m/s
+          type: number
+        cloud_cover:
+          description: Cloud cover percentage
+          type: integer
+        rain:
+          description: Whether it is raining
+          type: boolean
+        fog:
+          description: Whether it is foggy
+          type: boolean
+      required:
+      - report_time
+      - temperature
+      - humidity
+      - wind_speed
+      - cloud_cover
+      - rain
+      - fog
+
+info:
+  title: WeatherRadar API
+  version: 0.0.1
+  description: |
+    An API for weather data.
+  termsOfService: http://totally.not.placehold.er/
+  contact:
+    url: http://totally.not.placehold.er/
+    email: pwp-course@lists.oulu.fi
+    name: PWP Staff List
+  license:
+    name: Apache 2.0
+    url: https://www.apache.org/licenses/LICENSE-2.0.html
+
+paths:
+  # LOCATION COLLECTION
+  /locations/:
+    get:
+      description: Get the list of locations
+      responses:
+        '200':
+          description: List of locations
+          content:
+            application/json:
+              example:
+              - country: Finland
+                city: Oulu
+                latitude: 65.01
+                longitude: 25.46
+    post:
+      description: Create a new location
+      requestBody:
+        description: JSON document that contains data for a new location
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Location'
+            example:
+              - country: Sweden
+                city: Stockholm
+                latitude: 59.33
+                longitude: 18.06
+      responses:
+        '201':
+          description: The location was created successfully
+          headers:
+            Location:
+              description: URI
+              schema:
+                type: string
+        '400':
+          description: The request body was not valid
+        '409':
+          description: A location with the same name already exists
+        '415':
+          description: Wrong media type was used
+  # LOCATION ITEM
+  /locations/{location}/:
+    get:
+      description: Get a specific location
+      parameters:
+        - $ref: '#/components/parameters/location'
+      responses:
+        '200':
+          description: Specific location information
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Location'
+    put:
+      description: Update an existing location
+      parameters:
+        - $ref: '#/components/parameters/location'
+      requestBody:
+        description: JSON document that contains updated data for a location
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Location'
+            example:
+                country: Norway
+                city: Oslo
+                latitude: 59.91
+                longitude: 10.74
+      responses:
+        '204':
+          description: The location was updated successfully
+        '400':
+          description: The request body was not valid
+        '409':
+          description: A location with the same name already exists
+        '415':
+          description: Wrong media type was used
+    delete:
+      description: Delete an existing location.
+      parameters:
+        - $ref: '#/components/parameters/location'
+      responses:
+        '204':
+          description: The location was deleted successfully
+  # FORECAST COLLECTION
+  /locations/{location}/forecasts/:
+    get:
+      description: Get the list of forecasts
+      parameters:
+        - $ref: '#/components/parameters/location'
+      responses:
+        '200':
+          description: List of forecasts
+          content:
+            application/json:
+              example:
+              - report_time: "2026-03-19T12:00:00Z"
+                forecast_time: "2026-03-19T15:00:00Z"
+                temperature: 22.0
+                humidity: 55
+                wind_speed: 4.0
+                cloud_cover: 20
+                rain: false
+                fog: false
+    post:
+      description: Create a new forecast
+      parameters:
+        - $ref: '#/components/parameters/location'
+      requestBody:
+        description: JSON document that contains data for a new forecast
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Report'
+            example:
+              - report_time: "2026-03-19T12:00:00Z"
+                forecast_time: "2026-03-19T16:00:00Z"
+                temperature: 24.0
+                humidity: 56
+                wind_speed: 6.0
+                cloud_cover: 22
+                rain: false
+                fog: false
+      responses:
+        '201':
+          description: The forecast was created successfully
+          headers:
+            Location:
+              description: URI
+              schema:
+                type: string
+        '400':
+          description: The request body was not valid
+        '409':
+          description: A forecast with the same attributes already exists
+        '415':
+          description: Wrong media type was used
+  # FORECAST ITEM
+  /locations/{location}/forecasts/{forecast}/:
+    get:
+      description: Get a specific forecast
+      parameters:
+        - $ref: '#/components/parameters/location'
+        - $ref: '#/components/parameters/forecast'
+      responses:
+        '200':
+          description: Specific forecast information
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Report'
+    put:
+      description: Update an existing forecast
+      parameters:
+        - $ref: '#/components/parameters/location'
+        - $ref: '#/components/parameters/forecast'
+      requestBody:
+        description: JSON document that contains updated data for a forecast
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Report'
+            example:
+              - report_time: "2026-03-19T12:00:00Z"
+                forecast_time: "2026-03-19T17:00:00Z"
+                temperature: 26.0
+                humidity: 58
+                wind_speed: 8.0
+                cloud_cover: 24
+                rain: false
+                fog: false
+      responses:
+        '204':
+          description: The forecast was updated successfully
+        '400':
+          description: The request body was not valid
+        '409':
+          description: A forecast with the same attributes exists
+        '415':
+          description: Wrong media type was used
+    delete:
+      description: Delete an existing forecast.
+      parameters:
+        - $ref: '#/components/parameters/location'
+        - $ref: '#/components/parameters/forecast'
+      responses:
+        '204':
+          description: The forecast was deleted successfully
+  # REPORT COLLECTION
+  /locations/{location}/reports/:
+    get:
+      description: Get the list of reports
+      parameters:
+        - $ref: '#/components/parameters/location'
+      responses:
+        '200':
+          description: List of reports
+          content:
+            application/json:
+              example:
+              - report_time: "2026-03-19T11:00:00Z"
+                temperature: 20.0
+                humidity: 50
+                wind_speed: 2.0
+                cloud_cover: 10
+                rain: false
+                fog: false
+    post:
+      description: Create a new report
+      parameters:
+        - $ref: '#/components/parameters/location'
+      requestBody:
+        description: JSON document that contains data for a new report
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Report'
+            example:
+              - report_time: "2026-03-19T10:00:00Z"
+                temperature: 18.0
+                humidity: 48
+                wind_speed: 1.0
+                cloud_cover: 5
+                rain: false
+                fog: false
+      responses:
+        '201':
+          description: The report was created successfully
+          headers:
+            Location:
+              description: URI
+              schema:
+                type: string
+        '400':
+          description: The request body was not valid
+        '409':
+          description: A report with the same attributes already exists
+        '415':
+          description: Wrong media type was used
+  # REPORT ITEM
+  /locations/{location}/reports/{report}/:
+    get:
+      description: Get a specific report
+      parameters:
+        - $ref: '#/components/parameters/location'
+        - $ref: '#/components/parameters/report'
+      responses:
+        '200':
+          description: Specific report information
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Report'
+    put:
+      description: Update an existing report
+      parameters:
+        - $ref: '#/components/parameters/location'
+        - $ref: '#/components/parameters/report'
+      requestBody:
+        description: JSON document that contains updated data for a report
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Report'
+            example:
+              - report_time: "2026-03-19T9:00:00Z"
+                temperature: 16.0
+                humidity: 46
+                wind_speed: 6.0
+                cloud_cover: 6
+                rain: false
+                fog: false
+      responses:
+        '204':
+          description: The report was updated successfully
+        '400':
+          description: The request body was not valid
+        '409':
+          description: A report with the same attributes exists
+        '415':
+          description: Wrong media type was used
+    delete:
+      description: Delete an existing report.
+      parameters:
+        - $ref: '#/components/parameters/location'
+        - $ref: '#/components/parameters/report'
+      responses:
+        '204':
+          description: The report was deleted successfully
