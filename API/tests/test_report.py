@@ -2,8 +2,8 @@ import json
 from urllib import response
 import pytest
 from datetime import datetime, timedelta, timezone
-from api.weatherradar import db, create_app
-from api.weatherradar.models import WeatherReport, Location
+from API.weatherradar import db, create_app
+from API.weatherradar.models import WeatherReport, Location
 
 
 @pytest.fixture

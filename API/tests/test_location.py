@@ -1,7 +1,7 @@
 import json
 import pytest
-from api.weatherradar import db, create_app
-from api.weatherradar.models import Location
+from API.weatherradar import db, create_app
+from API.weatherradar.models import Location
 
 
 @pytest.fixture
