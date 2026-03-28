@@ -6,7 +6,7 @@ from jsonschema import ValidationError, validate
 from sqlalchemy.exc import IntegrityError
 from werkzeug.exceptions import BadRequest, Conflict, UnsupportedMediaType
 
-from api.weatherradar import db
+from API.weatherradar import db
 
 
 class Locations(Resource):
@@ -17,7 +17,7 @@ class Locations(Resource):
 
         Returns a list of forecasts for the specified location.
         """
-        from api.weatherradar.models import Location
+        from API.weatherradar.models import Location
 
         response_data = []
         locations = Location.query.all()
@@ -31,7 +31,7 @@ class Locations(Resource):
         The request body must be a JSON object containing the location data.
         Returns a 201 Created response with a Location header pointing to the new location.
         """
-        from api.weatherradar.models import Location
+        from API.weatherradar.models import Location
 
         if request.content_type != "application/json":
             raise UnsupportedMediaType(
@@ -78,7 +78,7 @@ class LocationItem(Resource):
         The request body must be a JSON object containing the updated location data.
         Returns a 204 No Content response if the update is successful.
         """
-        from api.weatherradar.models import Location
+        from API.weatherradar.models import Location
 
         if request.content_type != "application/json":
             raise UnsupportedMediaType(

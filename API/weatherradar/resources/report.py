@@ -6,8 +6,8 @@ from sqlalchemy.exc import IntegrityError
 from jsonschema import validate
 from jsonschema.exceptions import ValidationError
 
-from api.weatherradar.models import WeatherReport
-from api.weatherradar import db
+from API.weatherradar.models import WeatherReport
+from API.weatherradar import db
 
 
 class WeatherReports(Resource):
