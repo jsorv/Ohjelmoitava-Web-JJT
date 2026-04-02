@@ -10,6 +10,10 @@ Everything here is based on the tutorial mentioned above.
 
 - supervisor
 
+- nginx
+
+- ngrok
+
 ## Deployment instructions
 
 First setup the environment you want to use. (Preferrably a virtual machine running on Linux, since isntructions are for a debian based system)
@@ -105,7 +109,11 @@ Conf file found from [here](weatherradar.conf)
 
 ### NGINX it
 
-1. Create an nginx file for weatherradar
+1. Install nginx
+
+``` sudo apt install nginx ```
+
+3. Create an nginx file for weatherradar
 
 ```sudo (nano/vi/gedit) /etc/nginx/sites-available/weatherradar```
 
@@ -113,7 +121,7 @@ Found [here](./weatherradar)
 
 (When deploying, change the server_name from localhost to the domain name or ip you are serving)
 
-2. Make sure this is used
+3. Make sure this is used
 
 ```sudo ln -s /etc/nginx/sites-available/weatherradar /etc/nginx/sites-enabled/weatherradar```
 
