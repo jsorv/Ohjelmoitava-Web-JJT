@@ -5,26 +5,27 @@ from werkzeug.routing import BaseConverter
 
 
 class LocationConverter(BaseConverter):
-    """Custom URL converter to fetch Location objects by their ID."""
+    """Custom URL converter to fetch Location objects by city slug."""
 
     def to_python(self, value):
-        """Fetches a Location object by its location_id."""
         from .models import Location
 
-        try:
-            location_id = int(value)
-        except ValueError as exc:
-            raise NotFound(description="Invalid location ID format") from exc
+        # Convert URL part to lowercase (slug)
+        slug = value.lower()
 
-        location = Location.query.filter_by(location_id=location_id).first()
+        # Find matching city (case-insensitive)
+        location = Location.query.filter(
+            Location.city.ilike(slug)
+        ).first()
+
         if not location:
             raise NotFound(description="Location not found")
+
         return location
 
     def to_url(self, value):
-        """Converts a Location object back to a URL component."""
-        return str(value.location_id)
-
+        # Convert Location object back to slug
+        return value.city.lower()
 
 class ForecastConverter(BaseConverter):
     """Custom URL converter to fetch WeatherReport forecasts by ID."""

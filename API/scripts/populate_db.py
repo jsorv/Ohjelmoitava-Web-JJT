@@ -60,19 +60,21 @@ if __name__ == "__main__":
     db.create_all()
     context.pop()
     with app.app_context():
-        oulu = create_location("Finland", "Oulu", 65.0121, 25.4651)
-        helsinki = create_location("Finland", "Helsinki", 60.1699, 24.9384)
-        tampere = create_location("Finland", "Tampere", 61.4978, 23.7610)
+        oulu = create_location("Finland", "Oulu", 65.01, 25.46)
+        washington = create_location("USA", "Washington", 38.89, -77.03)
+        moscow = create_location("Russia", "Moscow", 55.75, 37.61)
 
         now = datetime.now()
 
-        add_weather_report(
-            helsinki, "report", now, None, 5.2, 75, 3.5, 40, False, False
-        )
-        add_weather_report(tampere, "report", now, None, 3.1, 85, 2.2, 60, False, True)
+        add_weather_report(washington, "report", now, None, 5.2, 75, 3.5, 40, False, False)
+        add_weather_report(washington, "report", now - timedelta(hours=6), None, 5.2, 75, 3.5, 40, False, False)
+        add_weather_report(moscow, "report", now, None, 3.1, 85, 2.2, 60, False, True)
+        add_weather_report(moscow, "report", now - timedelta(hours=6), None, 3.1, 85, 2.2, 60, False, True)
         add_weather_report(oulu, "report", now, None, -2.5, 90, 1.0, 80, True, True)
+        add_weather_report(oulu, "report", now - timedelta(hours=6), None, -2.5, 90, 1.0, 80, True, True)
+
         add_weather_report(
-            helsinki,
+            washington,
             "forecast",
             now,
             now + timedelta(hours=6),
@@ -84,10 +86,34 @@ if __name__ == "__main__":
             False,
         )
         add_weather_report(
-            tampere,
+            washington,
+            "forecast",
+            now,
+            now + timedelta(hours=12),
+            4.0,
+            80,
+            4.0,
+            50,
+            True,
+            False,
+        )
+        add_weather_report(
+            moscow,
             "forecast",
             now,
             now + timedelta(hours=6),
+            2.0,
+            90,
+            3.0,
+            70,
+            False,
+            False,
+        )
+        add_weather_report(
+            moscow,
+            "forecast",
+            now,
+            now + timedelta(hours=12),
             2.0,
             90,
             3.0,
