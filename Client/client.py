@@ -1,14 +1,15 @@
-import requests
-from urllib.parse import urljoin
+"""Client for interacting with the WeatherRadar API."""
 
+import os
 from datetime import datetime
 from datetime import timedelta
+from urllib.parse import urljoin
+import requests
 from rich import print
 from rich.align import Align
-import os
 
 # --------------------------------------------------------
-hostname = "http://localhost:5000/weatherradar/api/"
+HOST_NAME = "http://localhost:5000/weatherradar/api/"
 # --------------------------------------------------------
 
 class APIDataSource:
@@ -47,7 +48,7 @@ class APIDataSource:
         self.session.close()
 
     # ----------------------------------------------------
-    
+
     # GET METHODS
     def get_locations(self):
         """
@@ -56,7 +57,7 @@ class APIDataSource:
         Returns:
             list: A list of location objects.
         """
-        return self._get(f"locations/")
+        return self._get("locations/")
 
     def get_location(self, location):
         """
@@ -81,7 +82,7 @@ class APIDataSource:
             list: A list of forecast entries.
         """
         return self._get(f"locations/{location}/forecasts/")
-    
+
     def get_forecast(self, location, forecast):
         """
         Retrieve a specific forecast for a location.
@@ -94,7 +95,7 @@ class APIDataSource:
             dict: Forecast data.
         """
         return self._get(f"locations/{location}/forecasts/{forecast}/")
-    
+
     def get_reports(self, location):
         """
         Retrieve all weather reports for a location.
@@ -106,7 +107,7 @@ class APIDataSource:
             list: A list of weather report entries.
         """
         return self._get(f"locations/{location}/reports/")
-    
+
     def get_report(self, location, report):
         """
         Retrieve a specific weather report.
@@ -119,7 +120,7 @@ class APIDataSource:
             dict: Weather report data.
         """
         return self._get(f"locations/{location}/reports/{report}/")
-    
+
     # POST METHODS
     def post_location(self, data):
         """
@@ -131,7 +132,7 @@ class APIDataSource:
         Returns:
             str: URI of the created location.
         """
-        return self._post(f"locations/", data)
+        return self._post("locations/", data)
 
     def post_forecast(self, location, data):
         """
@@ -145,7 +146,7 @@ class APIDataSource:
             str: URI of the created forecast.
         """
         return self._post(f"locations/{location}/forecasts/", data)
-    
+
     def post_report(self, location, data):
         """
         Create a new weather report for a location.
@@ -158,7 +159,7 @@ class APIDataSource:
             str: URI of the created report.
         """
         return self._post(f"locations/{location}/reports/", data)
-    
+
     # PUT METHODS
     def update_location(self, location, data):
         """
@@ -242,7 +243,7 @@ def print_entry(entry):
     if entry.get("forecast_time"):
         forecast_time = datetime.fromisoformat(entry["forecast_time"])
         print(f"Forecast time: {forecast_time.strftime('%d.%m.%Y %H:%M')}")
-    
+
     print(f"Temperature: {entry['temperature']} °C")
     print(f"Humidity: {entry['humidity']} %")
     print(f"Wind speed: {entry['wind_speed']} m/s")
@@ -304,7 +305,7 @@ def get_tomorrow_weather(api, location):
     forecasts = api.get_forecasts(location)
     if not forecasts:
         return None
-    
+
     target_time = datetime.now() + timedelta(hours=24)
 
     tomorrow_forecasts = []
@@ -332,18 +333,18 @@ def draw_map(selection):
                                  or None for the default map.
     """
     if selection == "oulu":
-        with open("oulumap.txt", "r") as map:
-            print(Align.center(map.read()))
+        with open("oulumap.txt", "r", encoding="utf-8") as map_file:
+            print(Align.center(map_file.read()))
     elif selection == "washington":
-        with open("washingtonmap.txt", "r") as map:
-            print(Align.center(map.read()))
+        with open("washingtonmap.txt", "r", encoding="utf-8") as map_file:
+            print(Align.center(map_file.read()))
     elif selection == "moscow":
-        with open("moscowmap.txt", "r") as map:
-            print(Align.center(map.read()))
+        with open("moscowmap.txt", "r", encoding="utf-8") as map_file:
+            print(Align.center(map_file.read()))
     else:
-        with open("fullmap.txt", "r") as map:
-            print(Align.center(map.read()))
-    
+        with open("fullmap.txt", "r", encoding="utf-8") as map_file:
+            print(Align.center(map_file.read()))
+
 def update_graphics(menu_status, selection):
     """
     Update the terminal UI based on the current menu state.
@@ -397,13 +398,13 @@ def main_ui_loop(api):
                 city_input = "washington"
             if city_input == "3":
                 city_input = "moscow"
-        
+
         if city_input not in ("oulu", "washington", "moscow", "1","2","3"):
             update_graphics(1, None)
             print("[red]That location is not available.[/red]")
             input("Press Enter to continue...")
             continue
-        
+
         # CITY MENU
         update_graphics(2, city_input)
         option_input = input().strip().lower()
@@ -417,7 +418,7 @@ def main_ui_loop(api):
             continue
 
         # 2. LIST ALL WEATHER FORECASTS FOR LOCATION
-        elif option_input == "2":
+        if option_input == "2":
             data = api.get_forecasts(city_input)
             update_graphics(3, None)
             print_list(data)
@@ -425,7 +426,7 @@ def main_ui_loop(api):
             continue
 
         # 3. GET CURRENT WEATHER (IN REPORTS)
-        elif option_input == "3":
+        if option_input == "3":
             data = get_current_weather(api, city_input)
             if data is None:
                 update_graphics(2, city_input)
@@ -439,7 +440,7 @@ def main_ui_loop(api):
                 continue
 
         # 4. GET FORECAST
-        elif option_input == "4":
+        if option_input == "4":
             data = get_tomorrow_weather(api, city_input)
             if data is None:
                 update_graphics(2, city_input)
@@ -459,5 +460,5 @@ def main_ui_loop(api):
             continue
 
 if __name__ == "__main__":
-    with APIDataSource(hostname) as api:
-        main_ui_loop(api)
+    with APIDataSource(HOST_NAME) as api_data_source:
+        main_ui_loop(api_data_source)
