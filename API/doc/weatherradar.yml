@@ -338,7 +338,7 @@ paths:
         '400':
           description: The request body was not valid
         '409':
-          description: A report with the same attributes already exists
+          description: Conflict - a report at the same time already exists
         '415':
           description: Wrong media type was used
   # REPORT ITEM
@@ -380,7 +380,7 @@ paths:
         '400':
           description: The request body was not valid
         '409':
-          description: A report with the same attributes exists
+          description: Conflict - a report at the same time already exists
         '415':
           description: Wrong media type was used
     delete:
