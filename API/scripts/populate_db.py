@@ -1,7 +1,7 @@
 """Script to populate the database with sample data for testing."""
 
 from datetime import datetime, timedelta
-from ..weatherradar import db, create_app
+from API.weatherradar import db, create_app
 
 
 def create_location(
@@ -50,7 +50,7 @@ def add_weather_report(
 if __name__ == "__main__":
     app = create_app()
     # Ensure models are imported after the app (and db) are available
-    from ..weatherradar import models
+    from API.weatherradar import models
 
     Location = models.Location
     WeatherReport = models.WeatherReport
